@@ -11,7 +11,7 @@ def web():
     return """<!doctype html>
         <html>
            <body>
-               <h1>web-сервер на flask</h1> 
+               <h1>web-сервер на flask</h1>
            </body>
         </html>""", 200, {
             'X-Server': 'sample',
@@ -26,7 +26,7 @@ def author ():
 
     return """ <!doctype html>
         <html>
-            <body>
+            <body>  
                 <p>Студент: """ + name + """</p>
                 <p>Группа: """ + group + """</p>
                 <p>Факультет: """ + faculty + """</p>
@@ -40,6 +40,9 @@ def image():
     return '''
 <!doctype html>
 <html>
+<head>
+    <link rel='stylesheet' href='.lab1.css'>
+</head>
     <body>
         <h1>Дуб</h1>
         <image src = "''' + path + '''">
