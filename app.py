@@ -2,6 +2,10 @@ from flask import Flask, url_for, request, redirect
 import datetime
 app = Flask(__name__)
 
+@app.errorhandler(404)
+def not_found(err):
+    return 'нет такой страницы', 404
+
 @app.route("/web")
 def web():
     return """<!doctype html>
@@ -75,4 +79,4 @@ def created():
         <div><i> что-то создано...</i></div>
     </body>
 </html>
-''', 201
+''', 201    
