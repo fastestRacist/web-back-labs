@@ -63,10 +63,15 @@ def image():
 </head>
 <body>
     <h1>Дуб</h1>
-    <img src="{path}" alt="oak">
+    <img src="{path}">
 </body>
 </html>
-'''
+''', 200, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Language": "ru",
+        "X-Author": "Khobenkov",
+        "X-Lab": "Lab1"
+    }
 
 count = 0
 @app.route('/lab1/counter')
