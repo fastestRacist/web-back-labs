@@ -93,3 +93,26 @@ def created():
     </body>
 </html>
 ''', 201    
+
+@app.route('/')
+@app.route('/index')
+def index():
+    return '''
+<!doctype html>
+<html>
+<head>
+    <title>НГТУ, ФБ, Лабораторные работы</title>
+</head>
+<body>
+    <header>
+        НГТУ, ФБ, WEB-программирование, часть 2. Список лабораторных
+    </header>
+    <ul>
+        <li><a href="/lab1">Первая лабораторная</a></li>
+    </ul>
+    <footer>
+        <p>Хобенков Егор Алексеевич, ФБИ-32, 3 курс, 2025 год</p>
+    </footer>
+</body>
+</html>
+'''
