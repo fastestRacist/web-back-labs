@@ -52,7 +52,7 @@ def image():
 '''
 
 count = 0
-@app.route('/counter')
+@app.route('/lab1/counter')
 def counter():
     global count
     count += 1
@@ -68,9 +68,16 @@ def counter():
         Дата и время: ''' + str(time) + '''<br>
         Запрошенный адрес: ''' + url + '''<br>
         Ваш IP-адрес: ''' + client_ip + '''<br>
+        <a href="/lab1/clear_counter">Сбросить счётчик</a>
     </body>
 </html>
 '''
+@app.route('/lab1/clear_counter')
+def clear_counter():
+    global count
+    count = 0
+    return redirect('/lab1/counter')
+
 @app.route('/info')
 def info():
     return redirect('/author')
