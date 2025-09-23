@@ -135,3 +135,27 @@ def lab1():
 </body>
 </html>
 '''
+
+@app.route('/lab1/400')
+def err400():
+    return "Неверный запрос", 400
+
+@app.route('/lab1/401')
+def err401():
+    return "Необходимо авторизироваться", 401
+
+@app.route('/lab1/402')
+def err402():
+    return "Требуется оплата", 402
+
+@app.route('/lab1/403')
+def err403():
+    return "Доступ запрещён", 403
+
+@app.route('/lab1/405')
+def err405():
+    return "Метод не поддерживается", 405
+
+@app.route('/lab1/418')
+def err418():
+    return "Я - чайник", 418
