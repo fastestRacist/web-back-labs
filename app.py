@@ -176,3 +176,19 @@ def err405():
 @app.route('/lab1/418')
 def err418():
     return "Я - чайник", 418
+
+@app.route('/lab1/error')
+def error500():
+    return 1/0 
+
+@app.errorhandler(500)
+def server_error(err):
+    return '''
+        <!doctype html>
+        <html>
+        <body>
+            <h1>Ошибка 500: внутренняя ошибка сервера</h1>
+            <p>Произошла непредвиденная ошибка.</p>
+        </body>
+        </html>
+        ''', 500
