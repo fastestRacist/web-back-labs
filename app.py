@@ -4,7 +4,24 @@ app = Flask(__name__)
 
 @app.errorhandler(404)
 def not_found(err):
-    return 'нет такой страницы', 404
+    return '''
+<!doctype html>
+<html>
+<head>
+    <style>
+        body {text-align: center;}
+        h1 {color: red;}
+        h2 {color: grey;}
+    </style>
+</head>
+<body>
+    <h1>404</h1>
+    <h2>Страница не найдена</h2>
+    <img src="/static/404.jpg" width="500">
+</body>
+</html>
+''', 404
+
 
 @app.route("/lab1/web")
 def web():
