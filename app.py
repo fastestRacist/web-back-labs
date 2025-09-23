@@ -2,25 +2,65 @@ from flask import Flask, url_for, request, redirect
 import datetime
 app = Flask(__name__)
 
+# @app.errorhandler(404)
+# def not_found(err):
+#     return '''
+# <!doctype html>
+# <html>
+# <head>
+#     <style>
+#         body {text-align: center;}
+#         h1 {color: red;}
+#         h2 {color: grey;}
+#     </style>
+# </head>
+# <body>
+#     <h1>404</h1>
+#     <h2>Страница не найдена</h2>
+#     <img src="/static/404.jpg" width="500">
+# </body>
+# </html>
+# ''', 404
+
+log_404 = []
+
 @app.errorhandler(404)
 def not_found(err):
-    return '''
+    client_ip = request.remote_addr
+    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    url = request.url
+    log_entry = f"[{time}, пользователь {client_ip}] зашел на адрес: {url}"
+    log_404.append(log_entry)
+    page = f'''
 <!doctype html>
 <html>
 <head>
+    <meta charset="utf-8">
     <style>
-        body {text-align: center;}
-        h1 {color: red;}
-        h2 {color: grey;}
+        body {{text-align: center;}}
+        h1 {{color: red;}}
+        h2 {{color: grey;}}
     </style>
 </head>
 <body>
     <h1>404</h1>
     <h2>Страница не найдена</h2>
     <img src="/static/404.jpg" width="500">
+    <p>IP пользователя: {client_ip}</p>
+    <p>Дата и время: {time}</p>
+    <p>Вы пытались открыть: {url}</p>
+    <p><a href="/">Перейти на главную страницу</a></p>
+
+    <div class="log">
+        <h2>Журнал</h2>
+        <ul>
+            {''.join(f"<li>{entry}</li>" for entry in log_404)}
+        </ul>
+    </div>
 </body>
 </html>
-''', 404
+'''
+    return page, 404
 
 
 @app.route("/lab1/web")
