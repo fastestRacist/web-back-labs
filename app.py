@@ -207,6 +207,7 @@ def lab1():
         <li><a href="/lab1/401">/lab1/401</a></li>
         <li><a href="/lab1/402">/lab1/402</a></li>
         <li><a href="/lab1/403">/lab1/403</a></li>
+        <li><a href="/lab1/404">/lab1/404</a></li>
         <li><a href="/lab1/405">/lab1/405</a></li>
         <li><a href="/lab1/418">/lab1/418</a></li>
     </ul>
