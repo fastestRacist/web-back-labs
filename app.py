@@ -254,3 +254,11 @@ def server_error(err):
         </body>
         </html>
         ''', 500
+
+@app.route('/lab2/a')
+def a():
+    return 'без слэша'
+
+@app.route('/lab2/a/')
+def a2():
+    return 'со слэшем'
