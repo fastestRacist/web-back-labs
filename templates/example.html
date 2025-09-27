@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +17,10 @@
         3258 - 759 = {{3258 - 759}} <br>
         8452 &divide; 793 = {{8452/793}} <br>
         45<sup>8</sup> = {{45**8}} <br>
+        <ul>
+            {% for f in fruits %}
+            <li>{{ loop.index }} - {{ f.name }}: {{ f.price }} &#x20bd;</li>
+            {% endfor %}
     </main>
 
     <footer>
