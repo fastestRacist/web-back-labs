@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цветы</title>
+</head>
+<body>
+    <main>
+        <h1>Список цветов</h1>
+        <ol>
+            {% for f in flower %}
+              <li>
+                {{ f.flower }} — {{ f.price }} руб.
+                <a href="{{ url_for('delete_flower', idx=loop.index0) }}">удалить</a>
+              </li>
+            {% endfor %}
+        </ol>
+
+        <p>
+            <a href='/lab2/del_flowers/'>Удалить все цветы</a>
+        </p>
+
+        <h2>Добавление нового цветка</h2>
+
+        <form method="post" action="/lab2/add_flower/">
+            <p>Название: <input type="text" name="name"></p>
+            <p>Цена: <input type="number" name="price"></p>
+            <p><button type="submit">Добавить</button></p>
+        </form>
+    </main>
+</body>
+</html>
