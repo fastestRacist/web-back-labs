@@ -378,3 +378,22 @@ def calc1():
 @app.route('/lab2/calc/<int:num1>')
 def calc_with_one(num1):
     return redirect(url_for('calc', num1=num1, num2=1))
+
+books = [
+    {"author": "Фёдор Достоевский", "title": "Преступление и наказание", "genre": "Роман", "pages": 671},
+    {"author": "Лев Толстой", "title": "Война и мир", "genre": "Эпопея", "pages": 1225},
+    {"author": "Михаил Булгаков", "title": "Мастер и Маргарита", "genre": "Фантастика", "pages": 480},
+    {"author": "Антон Чехов", "title": "Рассказы", "genre": "Рассказы", "pages": 320},
+    {"author": "Александр Пушкин", "title": "Евгений Онегин", "genre": "Роман в стихах", "pages": 240},
+    {"author": "Николай Гоголь", "title": "Мёртвые души", "genre": "Поэма", "pages": 352},
+    {"author": "Иван Тургенев", "title": "Отцы и дети", "genre": "Роман", "pages": 288},
+    {"author": "Александр Солженицын", "title": "Архипелаг ГУЛАГ", "genre": "История", "pages": 1424},
+    {"author": "Владимир Набоков", "title": "Лолита", "genre": "Роман", "pages": 336},
+    {"author": "Михаил Лермонтов", "title": "Герой нашего времени", "genre": "Роман", "pages": 224},
+    {"author": "Иван Бунин", "title": "Тёмные аллеи", "genre": "Рассказы", "pages": 192},
+    {"author": "Борис Пастернак", "title": "Доктор Живаго", "genre": "Роман", "pages": 608}
+]
+
+@app.route('/lab2/books')
+def show_books():
+    return render_template('books.html', books=books)
