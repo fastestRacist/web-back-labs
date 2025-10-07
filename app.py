@@ -171,6 +171,7 @@ def index():
     </header>
     <ul>
         <li><a href="/lab1">Первая лабораторная</a></li>
+        <li><a href="/lab2/">Вторая лабораторная</a></li>
     </ul>
     <footer>
         <p>Хобенков Егор Алексеевич, ФБИ-32, 3 курс, 2025 год</p>
@@ -304,7 +305,7 @@ def add_flower(name):
 def no_flower():
     abort(400, "вы не задали имя цветка")
 
-@app.route('/lab2/all_flowers')
+@app.route('/lab2/all_flowers/')
 def all_flowers():
     return f'''
 <!doctype html>
@@ -324,7 +325,7 @@ def all_flowers():
 </html>
 '''
 
-@app.route('/lab2/clear_flowers')
+@app.route('/lab2/clear_flowers/')
 def clear_flowers():
     flower_list.clear()
     return f'''
@@ -357,14 +358,14 @@ def example():
 def lab2():
     return render_template('lab2.html')
 
-@app.route('/lab2/filters')
+@app.route('/lab2/filters/')
 def filters():
     phrase = "О сколько нам открытий чудных..."
     return render_template('filter.html', phrase=phrase)
 
 @app.route('/lab2/calc/<int:num1>/<int:num2>')
 def calc(num1, num2):
-    return f'''<h1>Расчёт с параметрами:</h1>
+    return f'''<h1>Калькулятор:</h1>
     <p>{num1} + {num2} = {num1 + num2}<br>
     {num1} - {num2} = {num1 - num2}<br>
     {num1} x {num2} = {num1 * num2}<br>
@@ -394,7 +395,7 @@ books = [
     {"author": "Борис Пастернак", "title": "Доктор Живаго", "genre": "Роман", "pages": 608}
 ]
 
-@app.route('/lab2/books')
+@app.route('/lab2/books/')
 def show_books():
     return render_template('books.html', books=books)
 
