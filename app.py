@@ -397,3 +397,32 @@ books = [
 @app.route('/lab2/books')
 def show_books():
     return render_template('books.html', books=books)
+
+@app.route('/lab2/cars/')
+def gallery():
+    logos = [
+        {"name": "Acura", "pic": "Acura", "country": "Япония"},
+        {"name": "Audi", "pic": "Audi", "country": "Германия"},
+        {"name": "Alpina", "pic": "Alpina", "country": "Германия"},
+        {"name": "Aston Martin", "pic": "Aston Martin", "country": "Великобритания"},
+        {"name": "BMW", "pic": "BMW", "country": "Германия"},
+        {"name": "Bentley", "pic": "Bentley", "country": "Великобритания"},
+        {"name": "Bugatti", "pic": "Bugatti", "country": "Франция"},
+        {"name": "Cadillac", "pic": "Cadillac", "country": "СЩА"},
+        {"name": "Chery", "pic": "Chery", "country": "Китай"},
+        {"name": "Chevrolet", "pic": "Chevrolet", "country": "США"},
+        {"name": "Citroen", "pic": "Citroen", "country": "Франция"},
+        {"name": "Dodge", "pic": "Dodge", "country": "США"},
+        {"name": "EXEED", "pic": "EXEED", "country": "Китай"},
+        {"name": "Ferrari", "pic": "Ferrari", "country": "Италия"},
+        {"name": "Geely", "pic": "Geely", "country": "Китай"},
+        {"name": "Honda", "pic": "Honda", "country": "Япония"},
+        {"name": "Hyundai", "pic": "Hyundai", "country": "Южная Корея"},
+        {"name": "Infinity", "pic": "Infinity", "country": "Япония"},
+        {"name": "Jaguar", "pic": "Jaguar", "country": "Великобритания"},
+        {"name": "Jeep", "pic": "Jeep", "country": "США"},
+    ]
+    for item in logos:
+        item["img_url"] = url_for('static',
+                                  filename=f'{item["pic"]}.jpg')
+    return render_template('cars.html', items=logos)
