@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Библиотека книг</title>
+{% extends "base.html" %}
+{% block lab %} Лабораторная работа 2 - Книги{% endblock %}
+{% block main %}
     <style>
         body {
             display: flex;
@@ -27,8 +24,6 @@
             font-size: 12pt;
         }
     </style>
-</head>
-<body>
     <div>
         <h1>Книги</h1>
     </div>
@@ -42,5 +37,4 @@
         </div>
         {% endfor %}
     </div>
-</body>
-</html>
+{% endblock %}
