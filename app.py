@@ -394,7 +394,7 @@ def lab2():
 
 @app.route('/lab2/filters/')
 def filters():
-    phrase = "О сколько нам открытий чудных..."
+    phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
     return render_template('filter.html', phrase=phrase)
 
 @app.route('/lab2/calc/<int:num1>/<int:num2>')
