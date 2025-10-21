@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block lab %} Лабораторная работа 3 {% endblock %}
+
+{% block main %}
+    <h1>Поиск автомобилей</h1>
+
+    <form method="GET" action="/lab3/car">
+        <div>
+            <div>
+                <div>
+                    <label for="min_price">Минимальная цена:</label>
+                    <input type="number" id="min_price" name="min_price" 
+                           value="{{ min_price or '' }}" 
+                           placeholder="От {{ min_possible_price }} руб."
+                           min="0">
+                </div>
+
+                <div>
+                    <label for="max_price">Максимальная цена:</label>
+                    <input type="number" id="max_price" name="max_price" 
+                           value="{{ max_price or '' }}" 
+                           placeholder="До {{ max_possible_price }} руб."
+                           min="0">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit">
+                    Искать
+                </button>
+                <button type="button" onclick="clearSearch()">
+                    Сброс
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {% if cars %}
+        <div>
+            <h3>Найдено автомобилей: {{ cars|length }}</h3>
+        </div>
+
+        <div>
+            {% for car in cars %}
+            <div>
+                <h4>{{ car.brand }} {{ car.name }}</h4>
+                <div>
+                    {{ car.price }} руб.
+                </div>
+                <div>
+                    <div>Страна: {{ car.country }}</div>
+                    <div>Тип кузова: {{ car.body_type }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% elif message %}
+        <div>
+            <h3>Не найдено ни одного автомобиля</h3>
+            <p>Попробуйте изменить диапазон цен</p>
+        </div>
+    {% endif %}
+
+    <script>
+        function clearSearch() {
+            document.getElementById('min_price').value = '';
+            document.getElementById('max_price').value = '';
+            window.location.href = '/lab3/car?clear=1';
+        }
+    </script>
+{% endblock %}
