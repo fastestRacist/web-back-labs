@@ -134,15 +134,15 @@ def example():
         {'name': 'мандарины', 'price': 95},
         {'name': 'манго', 'price': 321},
         ]
-    return render_template('example.html', name = name, group = group, course = course, lab_num = lab_num, fruits = fruits)
+    return render_template('/lab2/example.html', name = name, group = group, course = course, lab_num = lab_num, fruits = fruits)
 @lab2.route('/lab2/')
 def lab():
-    return render_template('lab2.html')
+    return render_template('/lab2/lab2.html')
 
 @lab2.route('/lab2/filters/')
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
-    return render_template('filter.html', phrase=phrase)
+    return render_template('/lab2/filter.html', phrase=phrase)
 
 @lab2.route('/lab2/calc/<int:num1>/<int:num2>')
 def calc(num1, num2):
@@ -155,11 +155,11 @@ def calc(num1, num2):
 
 @lab2.route('/lab2/calc/')
 def calc1():
-    return redirect(url_for('calc', num1=1, num2=1))
+    return redirect(url_for('lab2.calc', num1=1, num2=1))
 
 @lab2.route('/lab2/calc/<int:num1>')
 def calc_with_one(num1):
-    return redirect(url_for('calc', num1=num1, num2=1))
+    return redirect(url_for('lab2.calc', num1=num1, num2=1))
 
 books = [
     {"author": "Фёдор Достоевский", "title": "Преступление и наказание", "genre": "Роман", "pages": 671},
@@ -178,7 +178,7 @@ books = [
 
 @lab2.route('/lab2/books/')
 def show_books():
-    return render_template('books.html', books=books)
+    return render_template('/lab2/books.html', books=books)
 
 @lab2.route('/lab2/cars/')
 def gallery():
@@ -206,5 +206,5 @@ def gallery():
     ]
     for item in logos:
         item["img_url"] = url_for('static',
-                                  filename=f'{item["pic"]}.jpg')
+                                  filename=f'lab2/{item["pic"]}.jpg')
     return render_template('cars.html', items=logos)
