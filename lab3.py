@@ -96,3 +96,72 @@ def settings():
     fontfamily = request.cookies.get('fontfamily')
     resp = make_response(render_template('lab3/settings.html',color=color, bgcolor=bgcolor, fontsize=fontsize, fontfamily=fontfamily))
     return resp
+
+
+from flask import request, render_template, redirect
+import datetime
+
+@lab3.route('/lab3/ticket', methods=['GET', 'POST'])
+def ticket():
+    if request.method == 'GET':
+        return render_template('lab3/ticket_form.html')
+    fio = request.form.get('fio')
+    shelf = request.form.get('shelf')
+    linen = request.form.get('linen') == 'on'
+    luggage = request.form.get('luggage') == 'on'
+    age = request.form.get('age')
+    departure = request.form.get('departure')
+    destination = request.form.get('destination')
+    date = request.form.get('date')
+    insurance = request.form.get('insurance') == 'on'
+    errors = []
+    if not fio or not fio.strip():
+        errors.append("ФИО пассажира обязательно")
+    if not shelf:
+        errors.append("Выберите полку")
+    if not age:
+        errors.append("Возраст обязателен")
+    elif not age.isdigit() or int(age) < 1 or int(age) > 120:
+        errors.append("Возраст должен быть от 1 до 120 лет")
+    if not departure or not departure.strip():
+        errors.append("Пункт выезда обязателен")
+    if not destination or not destination.strip():
+        errors.append("Пункт назначения обязателен")
+    if not date:
+        errors.append("Дата поездки обязательна")
+    if errors:
+        return render_template('lab3/ticket_form.html', 
+                             errors=errors, fio=fio, shelf=shelf, 
+                             linen=linen, luggage=luggage, age=age,
+                             departure=departure, destination=destination, 
+                             date=date, insurance=insurance)
+    age_int = int(age)
+    is_child = age_int < 18
+    if is_child:
+        price = 700
+    else:
+        price = 1000
+    if shelf in ['lower', 'lower_side']:
+        price += 100
+    if linen:
+        price += 75
+    if luggage:
+        price += 250
+    if insurance:
+        price += 150
+    return render_template('lab3/ticket_result.html',
+                         fio=fio, shelf=shelf, linen=linen,
+                         luggage=luggage, age=age, is_child=is_child,
+                         departure=departure, destination=destination,
+                         date=date, insurance=insurance, price=price,
+                         timestamp=datetime.datetime.now().strftime("%d.%m.%Y %H:%M"))
+
+@lab3.route('/lab3/clear_cookies')
+def clear_cookies():
+    """Очистка всех куки настроек"""
+    resp = redirect('/lab3/settings')
+    resp.set_cookie('color', '', expires=0)
+    resp.set_cookie('bgcolor', '', expires=0)
+    resp.set_cookie('fontsize', '', expires=0)
+    resp.set_cookie('fontfamily', '', expires=0)
+    return resp
