@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block lab %} Лабораторная работа 3 {% endblock %}
+
+{% block main %}
+    <style>
+    form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    form div {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        padding: 8px;
+        margin: 5px 0;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #d8d8d8;
+    }
+    .dop {
+        color: green;
+    }
+    .drink {
+        color: blue
+    }
+    </style>
+    <h1>Заказ напитка</h1>
+
+    <form action="/lab3/pay">
+        <div>Напиток:</div>
+        <label>
+            <input type="radio" value="cofee" name="drink" checked>кофе
+            <span class="drink"> 120 &#8381;</span>
+        </label>
+        <label>
+            <input type="radio" value="black-tea" name="drink" checked>черный чай
+            <span class="drink"> 80 &#8381;</span>
+        </label>
+        <label>
+            <input type="radio" value="green-tea" name="drink" checked>зеленый чай
+            <span class="drink"> 70 &#8381;</span>
+        </label>
+
+        <div>Добавки:</div>
+        <label>
+            <input type="checkbox" name="milk" checked>молоко
+            <span class="dop">30 &#8381;</span>
+        </label>
+        <label>
+            <input type="checkbox" name="sugar" checked>сахар
+            <span class="dop">10 &#8381;</span>
+        </label>
+
+        <div>
+            <button type="submit">Заказать</button>
+        </div>
+    </form>
+{% endblock %}
