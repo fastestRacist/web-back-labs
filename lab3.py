@@ -157,10 +157,10 @@ def ticket():
 def clear_cookies():
     """Очистка всех куки настроек"""
     resp = redirect('/lab3/settings')
-    resp.set_cookie('color', '', expires=0)
-    resp.set_cookie('bgcolor', '', expires=0)
-    resp.set_cookie('fontsize', '', expires=0)
-    resp.set_cookie('fontfamily', '', expires=0)
+    resp.delete_cookie('color')
+    resp.delete_cookie('bgcolor')
+    resp.delete_cookie('fontsize')
+    resp.delete_cookie('fontfamily')
     return resp
 
 
@@ -258,13 +258,5 @@ def car():
     if not filtered_cars:
         message = "Не найдено ни одного автомобиля"
 
-    return render_template(
-        'lab3/car.html',
-        cars=filtered_cars,
-        min_price=min_price or '',
-        max_price=max_price or '',
-        min_possible_price=min_possible_price,
-        max_possible_price=max_possible_price,
-        message=message,
-        count=len(filtered_cars)
-    )
+    return render_template('lab3/car.html', cars=filtered_cars, min_price=min_price or '', max_price=max_price or '',
+        min_possible_price=min_possible_price, max_possible_price=max_possible_price, message=message, count=len(filtered_cars))
