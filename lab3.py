@@ -15,8 +15,8 @@ def lab():
 def cookie():
     resp = make_response(redirect('/lab3/'))
     resp.set_cookie('name','Alex', max_age=5)
-    resp.set_cookie('age', '20')
-    resp.set_cookie('name_color','magenta')
+    resp.set_cookie('age', '20', max_age=5)
+    resp.set_cookie('name_color','magenta', max_age=5)
     return resp
 
 
@@ -126,11 +126,8 @@ def ticket():
     if not date:
         errors.append("Дата поездки обязательна")
     if errors:
-        return render_template('lab3/ticket_form.html', 
-                             errors=errors, fio=fio, shelf=shelf, 
-                             linen=linen, luggage=luggage, age=age,
-                             departure=departure, destination=destination, 
-                             date=date, insurance=insurance)
+        return render_template('lab3/ticket_form.html', errors=errors, fio=fio, shelf=shelf, linen=linen, luggage=luggage, 
+                               age=age, departure=departure, destination=destination, date=date, insurance=insurance)
     age_int = int(age)
     is_child = age_int < 18
     if is_child:
@@ -145,12 +142,8 @@ def ticket():
         price += 250
     if insurance:
         price += 150
-    return render_template('lab3/ticket_result.html',
-                         fio=fio, shelf=shelf, linen=linen,
-                         luggage=luggage, age=age, is_child=is_child,
-                         departure=departure, destination=destination,
-                         date=date, insurance=insurance, price=price,
-                         timestamp=datetime.datetime.now().strftime("%d.%m.%Y %H:%M"))
+    return render_template('lab3/ticket_result.html', fio=fio, shelf=shelf, linen=linen, luggage=luggage, age=age, is_child=is_child, departure=departure, 
+                           destination=destination, date=date, insurance=insurance, price=price)
 
 
 @lab3.route('/lab3/clear_cookies')

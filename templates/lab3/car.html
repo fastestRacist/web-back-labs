@@ -10,18 +10,14 @@
             <div>
                 <div>
                     <label for="min_price">Минимальная цена:</label>
-                    <input type="number" id="min_price" name="min_price" 
-                           value="{{ min_price or '' }}" 
-                           placeholder="От {{ min_possible_price }} руб."
-                           min="0">
+                    <input type="number" id="min_price" name="min_price" value="{{ min_price or '' }}" 
+                    placeholder="От {{ min_possible_price }} руб."min="0">
                 </div>
 
                 <div>
                     <label for="max_price">Максимальная цена:</label>
-                    <input type="number" id="max_price" name="max_price" 
-                           value="{{ max_price or '' }}" 
-                           placeholder="До {{ max_possible_price }} руб."
-                           min="0">
+                    <input type="number" id="max_price" name="max_price" value="{{ max_price or '' }}" 
+                           placeholder="До {{ max_possible_price }} руб."min="0">
                 </div>
             </div>
 
