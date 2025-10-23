@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block lab %}Возведение числа в степень {% endblock %}
+
+{% block main %}
+    <h2>Возведение числа в степень</h2>
+    {% if error %}
+        {{ error }}
+    {% elif ZeroDegError %}
+        {{ ZeroDegError }}
+    {% else %}
+    {{ x1 }} <sup>{{ x2 }}</sup> = {{ result }}
+    {% endif %}
+    <a href="/lab4/deg-form">Обратно к форме</a>
+{% endblock %}
