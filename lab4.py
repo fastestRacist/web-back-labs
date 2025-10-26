@@ -103,7 +103,7 @@ def deg():
 tree_count = 0
 
 
-@lab4.route('/lab4/tree', methods=['GET', 'POST'])
+@lab4.route('/lab4/tree/', methods=['GET', 'POST'])
 def tree():
     global tree_count
     if request.method == 'GET':
