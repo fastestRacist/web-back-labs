@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block lab %}Холодильник{% endblock %}
+{% block main %}
+<h1>Холодильник</h1>
+<form method="post">
+    <label>Введите температуру (°C):</label>
+    <input type="number" name="temperature" value="{{ temp }}">
+    <button type="submit">Установить</button>
+</form>
+
+{% if message %}
+  <p>{{ message }}</p>
+  {% for i in range(snowflakes) %}
+    <span style="color: blue;">❄️</span>
+  {% endfor %}
+{% endif %}
+{% endblock %}
