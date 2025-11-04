@@ -26,7 +26,9 @@
                 <label for="password">Пароль:</label>
                 <input type="password" id="password" name="password">
             </div>
+            {% if error %}
             <div style="background-color:red; color:white; display: inline-block; padding:3px; margin-top:2px; margin-bottom: 2px">{{ error }}</div>
+            {% endif %}
             <div>
                 <button type="submit">Войти</button>
                 <button type="reset">Отмена</button>

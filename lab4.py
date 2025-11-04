@@ -246,16 +246,11 @@ def register():
 
     login = request.form.get('login')
     password = request.form.get('password')
-    confirm = request.form.get('confirm')
     name = request.form.get('name')
-
+    sex = request.form.get('sex')
     # Проверки на заполненность полей
-    if not login or not password or not confirm or not name:
+    if not login or not password  or not name:
         return render_template('lab4/register.html', error='Все поля должны быть заполнены!')
-
-    # Проверка совпадения паролей
-    if password != confirm:
-        return render_template('lab4/register.html', error='Пароль и подтверждение не совпадают!')
 
     # Проверка, что логин уникален
     for user in users:
@@ -266,7 +261,8 @@ def register():
     users.append({
         'login': login,
         'password': password,
-        'name': name
+        'name': name,
+        'sex' : sex
     })
 
     return redirect('/lab4/login')
