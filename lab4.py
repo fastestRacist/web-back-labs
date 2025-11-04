@@ -202,3 +202,128 @@ def fridge():
             except ValueError:
                 message = "Ошибка: введите число"
     return render_template("lab4/fridge.html", message=message, snowflakes=snowflakes, temp=temp or '')
+
+
+@lab4.route('/lab4/grain/', methods=['GET', 'POST'])
+def grain():
+    prices = {'ячмень': 12000, 'овёс': 8500, 'пшеница': 9000, 'рожь': 15000}
+    message = None
+    discount_msg = None
+    total = None
+
+    if request.method == 'POST':
+        grain_type = request.form.get('grain')
+        weight_str = request.form.get('weight')
+
+        if not weight_str:
+            message = "Ошибка: не указан вес"
+        else:
+            try:
+                weight = float(weight_str)
+                if weight <= 0:
+                    message = "Ошибка: вес должен быть больше 0"
+                elif weight > 100:
+                    message = "Такого объёма сейчас нет в наличии"
+                else:
+                    price = prices.get(grain_type, 0)
+                    total = price * weight
+                    if weight > 10:
+                        discount = total * 0.1
+                        total -= discount
+                        discount_msg = f"Применена скидка 10% за большой объём (-{int(discount)} руб.)"
+                    message = f"Заказ успешно сформирован. Вы заказали {grain_type}. Вес: {weight} т. Сумма к оплате: {int(total)} руб."
+            except ValueError:
+                message = "Ошибка: введите корректное число веса"
+
+    return render_template("lab4/grain.html", message=message, discount_msg=discount_msg)
+
+
+# Страница регистрации
+@lab4.route('/lab4/register/', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('lab4/register.html')
+
+    login = request.form.get('login')
+    password = request.form.get('password')
+    confirm = request.form.get('confirm')
+    name = request.form.get('name')
+
+    # Проверки на заполненность полей
+    if not login or not password or not confirm or not name:
+        return render_template('lab4/register.html', error='Все поля должны быть заполнены!')
+
+    # Проверка совпадения паролей
+    if password != confirm:
+        return render_template('lab4/register.html', error='Пароль и подтверждение не совпадают!')
+
+    # Проверка, что логин уникален
+    for user in users:
+        if user['login'] == login:
+            return render_template('lab4/register.html', error='Такой логин уже существует!')
+
+    # Добавляем пользователя
+    users.append({
+        'login': login,
+        'password': password,
+        'name': name
+    })
+
+    return redirect('/lab4/login')
+
+
+# Страница со списком пользователей
+@lab4.route('/lab4/users/')
+def users_list():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+    return render_template('lab4/users.html', users=users, login=session['login'])
+
+
+# Удаление себя
+@lab4.route('/lab4/delete_user/', methods=['POST'])
+def delete_user():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+
+    global users
+    login = session['login']
+    users = [u for u in users if u['login'] != login]
+    session.pop('login', None)
+    return redirect('/lab4/login')
+
+
+# Редактирование своих данных
+@lab4.route('/lab4/edit_user/', methods=['GET', 'POST'])
+def edit_user():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+
+    login = session['login']
+    user = next((u for u in users if u['login'] == login), None)
+    if not user:
+        return redirect('/lab4/login')
+
+    if request.method == 'GET':
+        return render_template('lab4/edit_user.html', user=user)
+
+    new_login = request.form.get('login')
+    new_name = request.form.get('name')
+    new_password = request.form.get('password')
+    confirm = request.form.get('confirm')
+
+    # Проверки
+    if not new_login or not new_name:
+        return render_template('lab4/edit_user.html', user=user, error='Имя и логин должны быть заполнены!')
+
+    if new_password or confirm:
+        if new_password != confirm:
+            return render_template('lab4/edit_user.html', user=user, error='Пароль и подтверждение не совпадают!')
+        else:
+            user['password'] = new_password  # обновляем только если пароль указан и совпадает
+
+    user['login'] = new_login
+    user['name'] = new_name
+    session['login'] = new_login
+
+    return redirect('/lab4/users')
