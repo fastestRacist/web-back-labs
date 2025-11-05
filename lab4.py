@@ -238,7 +238,6 @@ def grain():
     return render_template("lab4/grain.html", message=message, discount_msg=discount_msg)
 
 
-# Страница регистрации
 @lab4.route('/lab4/register/', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -248,16 +247,13 @@ def register():
     password = request.form.get('password')
     name = request.form.get('name')
     sex = request.form.get('sex')
-    # Проверки на заполненность полей
     if not login or not password  or not name:
         return render_template('lab4/register.html', error='Все поля должны быть заполнены!')
 
-    # Проверка, что логин уникален
     for user in users:
         if user['login'] == login:
             return render_template('lab4/register.html', error='Такой логин уже существует!')
 
-    # Добавляем пользователя
     users.append({
         'login': login,
         'password': password,
@@ -268,7 +264,6 @@ def register():
     return redirect('/lab4/login')
 
 
-# Страница со списком пользователей
 @lab4.route('/lab4/users/')
 def users_list():
     if 'login' not in session:
@@ -276,20 +271,19 @@ def users_list():
     return render_template('lab4/users.html', users=users, login=session['login'])
 
 
-# Удаление себя
 @lab4.route('/lab4/delete_user/', methods=['POST'])
 def delete_user():
     if 'login' not in session:
         return redirect('/lab4/login')
-
-    global users
     login = session['login']
-    users = [u for u in users if u['login'] != login]
+    for u in users:
+        if u['login'] == login:
+            users.remove(u)
+            break  
     session.pop('login', None)
     return redirect('/lab4/login')
 
 
-# Редактирование своих данных
 @lab4.route('/lab4/edit_user/', methods=['GET', 'POST'])
 def edit_user():
     if 'login' not in session:
@@ -312,7 +306,6 @@ def edit_user():
     new_password = request.form.get('password')
     confirm = request.form.get('confirm')
 
-    # Проверки
     if not new_login or not new_name:
         return render_template('lab4/edit_user.html', user=user, error='Имя и логин должны быть заполнены!')
 
@@ -320,7 +313,7 @@ def edit_user():
         if new_password != confirm:
             return render_template('lab4/edit_user.html', user=user, error='Пароль и подтверждение не совпадают!')
         else:
-            user['password'] = new_password  # обновляем только если пароль указан и совпадает
+            user['password'] = new_password 
 
     user['login'] = new_login
     user['name'] = new_name
