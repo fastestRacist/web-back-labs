@@ -296,7 +296,11 @@ def edit_user():
         return redirect('/lab4/login')
 
     login = session['login']
-    user = next((u for u in users if u['login'] == login), None)
+    user = None
+    for u in users:
+        if u['login'] == login:
+            user = u
+            break
     if not user:
         return redirect('/lab4/login')
 
