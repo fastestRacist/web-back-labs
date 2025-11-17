@@ -4,11 +4,13 @@ from lab1 import lab1
 from lab2 import lab2
 from lab3 import lab3
 from lab4 import lab4
+from lab5 import lab5
 app = Flask(__name__)
 app.register_blueprint(lab1)
 app.register_blueprint(lab2)
 app.register_blueprint(lab3)
 app.register_blueprint(lab4)
+app.register_blueprint(lab5)
 
 app.secret_key = 'секретно-секретный секрет'
 
@@ -94,6 +96,7 @@ def index():
         <li><a href="/lab2/">Вторая лабораторная</a></li>
         <li><a href="/lab3/">Третья лабораторная</a></li>
         <li><a href="/lab4/">Четвертая лабораторная</a></li>
+        <li><a href="/lab5/">Пятая лабораторная</a></li>
     </ul>
     <footer>
         <p>Хобенков Егор Алексеевич, ФБИ-32, 3 курс, 2025 год</p>
