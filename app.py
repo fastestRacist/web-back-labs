@@ -12,7 +12,8 @@ app.register_blueprint(lab3)
 app.register_blueprint(lab4)
 app.register_blueprint(lab5)
 
-app.secret_key = 'секретно-секретный секрет'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный ключ')
+app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 
 
 # @app.errorhandler(404)
