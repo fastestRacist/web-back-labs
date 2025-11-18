@@ -9,13 +9,17 @@
     <div style="display:flex; background-color:rgb(159, 206, 206); justify-content:center; padding: 10px; position: relative; padding: 20px">
         <div>
             <a href="/lab5/list" style="display:inline; padding: 10px; background-color: white; margin: 5px 20px; text-decoration: none; color: black;">Список статей</a>
+            <a href="/lab5/public" style="display:inline; padding: 10px; background-color: white; margin: 5px 20px; text-decoration: none; color: black;">Публичные статьи</a>
             <a href="/lab5/create" style="display: inline; padding: 10px; background-color: white; margin: 5px 20px; text-decoration: none; color: black;">Создать статью</a>
+            <a href="/lab5/users" style="display: inline; padding: 10px; background-color: white; margin: 5px 20px; text-decoration: none; color: black;">Список пользователей</a>
             <a href="/lab5/login" style="display: inline; padding: 10px; background-color: white; margin: 5px 20px; text-decoration: none; color: black;">Войти</a>
             <a href="/lab5/register" style="display: inline; padding: 10px; background-color: white; margin: 5px 20px; text-decoration: none; color: black;">Регистрация</a>
         </div>
         <div style="position: absolute; right: 0; padding: 5px">
             {% if login %}
                 {{ login }}
+                <a href="/lab5/logout">Выйти</a>
+                <a href="/lab5/profile">Редактировать</a>
             {% else %}
                 Anonymous
             {% endif %}

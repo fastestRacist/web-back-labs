@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <div style="border-radius: 15px; padding: 30px; background: white; width: 80%;">
+            <h1 style="text-align: center;">Публичные статьи</h1>
+            {% if articles %}
+                {% for article in articles %}
+                    <div style="border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #b5ebeb;">
+                        <div sstyle="background-color: white; padding-left: 15px; margin: 15px 0; border-radius: 10px;">
+                            <h2>{{ article['title'] }}</h2>
+                            <div style="display: flex; gap: 10px;">
+                                {% if article['is_favorite'] %}
+                                    <span style="background: gold; color: black; padding: 2px 8px; border-radius: 10px; font-size: 12px;">Избранная</span>
+                                {% endif %}
+                                <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px;">
+                                    Автор: {{ article['author'] }}
+                                </span>
+                            </div>
+                        </div>
+                        <div style="background-color: white; padding: 2px; margin: 15px 0; border-radius: 10px;">
+                            <p>{{ article['article_text'] }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; color: #666; padding: 40px;">
+                    <p>Пока нет публичных статей</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

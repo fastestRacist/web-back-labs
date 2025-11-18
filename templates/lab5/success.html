@@ -3,8 +3,10 @@
 {% block lab %}Лабораторная работа 5{% endblock %}
 
 {% block main %}
-    <div>
-        <h1> Пользователь {{ login }} успешно зарегитрирован! </h1>
-        <a href="/lab5">К базе знаний</a>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <div style="display: inline-block; padding: 30px; background: rgb(178, 219, 221); border-radius: 15px; text-align: center;">
+            <h1>Пользователь {{ login }} успешно зарегистрирован!</h1>
+            <a href="/lab5">К базе знаний</a>
+        </div>
     </div>
 {% endblock %}
