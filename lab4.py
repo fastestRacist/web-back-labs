@@ -230,8 +230,8 @@ def grain():
                     if weight > 10:
                         discount = total * 0.1
                         total -= discount
-                        discount_msg = f"Применена скидка 10% за большой объём (-{int(discount)} руб.)"
-                    message = f"Заказ успешно сформирован. Вы заказали {grain_type}. Вес: {weight} т. Сумма к оплате: {int(total)} руб."
+                        discount_msg = f"Применена скидка 10% за большой объём (-{(discount)} руб.)"
+                    message = f"Заказ успешно сформирован. Вы заказали {grain_type}. Вес: {weight} т. Сумма к оплате: {(total)} руб."
             except ValueError:
                 message = "Ошибка: введите корректное число веса"
 

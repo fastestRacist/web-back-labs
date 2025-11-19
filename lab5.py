@@ -102,6 +102,48 @@ def login():
     return render_template('lab5/success_login.html', login = login)
 
 
+# @lab5.route('/lab5/create', methods = ['GET', 'POST'])
+# def create():
+#     login = session.get('login')
+#     if not login:
+#         return redirect('/lab5/login')
+#     if request.method == 'GET':
+#         return render_template('lab5/create_article.html')
+    
+#     title = request.form.get('title')
+#     article_text = request.form.get('article_text')
+#     is_public = request.form.get('is_public') == 'on'
+#     is_favorite = request.form.get('is_favorite') == 'on'
+
+#     if not title or not article_text:
+#         error_msg = ""
+#         if not title and not article_text:
+#             error_msg = "Заполните название и текст статьи"
+#         elif not title:
+#             error_msg = "Заполните название статьи"
+#         elif not article_text:
+#             error_msg = "Заполните текст статьи"
+        
+#         return render_template('lab5/create_article.html', error=error_msg, title=title, article_text=article_text)
+
+#     conn, cur = db_connect()
+
+#     if current_app.config['DB_TYPE'] == 'postgres':
+#         cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
+#     else:
+#         cur.execute("SELECT * FROM users WHERE login=?;", (login,))
+#     login_id = cur.fetchone()["id"]
+
+#     if current_app.config['DB_TYPE'] == 'postgres':
+#         cur.execute("INSERT INTO articles(user_id, title, article_text) \
+#                 VALUES (%s, %s, %s);", (login_id, title, article_text))
+#     else:
+#         cur.execute("INSERT INTO articles(user_id, title, article_text) \
+#                 VALUES (?, ?, ?);", (login_id, title, article_text))
+    
+#     db_close(conn, cur)
+#     return redirect('/lab5')
+
 @lab5.route('/lab5/create', methods = ['GET', 'POST'])
 def create():
     login = session.get('login')
@@ -135,11 +177,11 @@ def create():
     login_id = cur.fetchone()["id"]
 
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("INSERT INTO articles(user_id, title, article_text) \
-                VALUES (%s, %s, %s);", (login_id, title, article_text))
+        cur.execute("INSERT INTO articles(user_id, title, article_text, is_public, is_favorite) \
+                VALUES (%s, %s, %s, %s, %s);", (login_id, title, article_text, is_public, is_favorite))
     else:
-        cur.execute("INSERT INTO articles(user_id, title, article_text) \
-                VALUES (?, ?, ?);", (login_id, title, article_text))
+        cur.execute("INSERT INTO articles(user_id, title, article_text, is_public, is_favorite) \
+                VALUES (?, ?, ?, ?, ?);", (login_id, title, article_text, is_public, is_favorite))
     
     db_close(conn, cur)
     return redirect('/lab5')
