@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template, request, make_response, redirect, session, current_app
-
+import random
 lab6 = Blueprint('lab6', __name__)
-
 offices = []
 for i in range(1,11):
-    offices.append({"number": i, "tenant": ""})
+    offices.append({"number": i, "tenant": "", "price": random.randint(900,1000)})
 
 @lab6.route('/lab6/')
 def main():
