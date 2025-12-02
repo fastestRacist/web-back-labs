@@ -387,4 +387,4 @@ def profile():
     
     session['full_name'] = full_name
     db_close(conn, cur)
-    return redirect('/lab5/list')
+    return redirect('/lab5/list') 
