@@ -32,10 +32,28 @@
 
                 const bookingButton = document.createElement('button');
                 bookingButton.innerText = 'зарезервировать';
+                bookingButton.style.cssText = `
+                    background: green;
+                    color: white;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 12px;
+                `;
                 bookingButton.onclick = function() {booking(office.number)};
                 li.appendChild(bookingButton);
                 const cancelButton = document.createElement('button');
                 cancelButton.innerText = 'Освободить';
+                cancelButton.style.cssText = `
+                    background: red;
+                    color: white;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 12px;
+                `;
                 cancelButton.onclick = function() { cancellation(office.number); };
                 li.appendChild(cancelButton);
                 ul.appendChild(li);
@@ -44,7 +62,7 @@
                 }
             }
             
-            if (totalCost > 0) {
+            if (userLogin && totalCost > 0) {
                 total_cost.textContent = `Общая стоимость вашей аренды: ${totalCost} руб.`;
             } 
             else {
@@ -131,7 +149,16 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Список кабинетов</h1>
-    <ul id = "office-list"></ul>
-    <h3 id="total-cost"></h2>
+    <h1 style="color: #2c3e50;
+        margin-bottom: 24px;
+        font-weight: 700;">Список кабинетов</h1>
+    <ul id = "office-list" style="list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 16px;
+        max-width: 800px;"></ul>
+    <h3 id="total-cost" style="color: #2c3e50;
+        margin-bottom: 24px;
+        font-weight: 700;"></h2>
 {% endblock %}
