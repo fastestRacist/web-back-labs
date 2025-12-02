@@ -89,13 +89,47 @@ lab6 = Blueprint('lab6', __name__)
 #                     'result': 'success',
 #                     'id': id
 #                 }
+
+def check_and_init_offices():
+    """Проверяем и при необходимости заполняем таблицу offices данными."""
+    conn, cur = db_connect()
+    try:
+        # Проверяем, есть ли записи в таблице
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT COUNT(*) AS cnt FROM offices")
+        else:
+            cur.execute("SELECT COUNT(*) AS cnt FROM offices")
+        
+        row = cur.fetchone()
+        count = row['cnt'] if row else 0
+
+        # Если таблица пустая — заполняем 10 офисов
+        if count == 0:
+            for i in range(1, 11):
+                price = random.randint(900, 1000)
+                if current_app.config['DB_TYPE'] == 'postgres':
+                    cur.execute(
+                        "INSERT INTO offices (number, tenant, price) VALUES (%s, %s, %s)",
+                        (i, '', price)
+                    )
+                else:
+                    cur.execute(
+                        "INSERT INTO offices (number, tenant, price) VALUES (?, ?, ?)",
+                        (i, '', price)
+                    )
+    finally:
+        db_close(conn, cur)
+
+
 @lab6.route('/lab6/')
 def main():    
+    check_and_init_offices()    
     return render_template('lab6/lab6.html')
 
 
 @lab6.route('/lab6/json-rpc-api/', methods=['POST'])
 def api():
+    check_and_init_offices()    
     data = request.json
     id = data.get('id')
     method = data.get('method')
