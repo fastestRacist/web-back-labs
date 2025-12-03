@@ -232,7 +232,7 @@ def api():
                 'id': id
             }
 
-        # Офис арендован другим пользователем
+        #офис арендован другим пользователем
         if tenant != login:
             db_close(conn, cur)
             return {
@@ -244,7 +244,7 @@ def api():
                 'id': id
             }
 
-        # Снимаем аренду
+        #снимаем аренду
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute(
                 "UPDATE offices SET tenant = %s WHERE number = %s",

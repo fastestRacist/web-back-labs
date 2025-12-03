@@ -4,6 +4,7 @@
 
 {% block script %}
 <script>
+//запрос отправляем через fetch
     function getOfficeList() {
         const url = '/lab6/json-rpc-api/';
         const json = {
@@ -16,11 +17,12 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(json)
         })
+        //обработка ответа 
         .then(function(response) {
             return response.json()
         })
         .then(function(data) {
-            const office_list = data.result;
+            const office_list = data.result; //массив офисов
             const ul = document.getElementById('office-list');
             const total_cost = document.getElementById('total-cost');
             let totalCost = 0;
