@@ -89,36 +89,26 @@ lab6 = Blueprint('lab6', __name__)
 #                     'result': 'success',
 #                     'id': id
 #                 }
-
+#провера на то что таблица есть и если ее нет то вставлять туда данные
 def check_and_init_offices():
-    """Проверяем и при необходимости заполняем таблицу offices данными."""
     conn, cur = db_connect()
-    try:
-        # Проверяем, есть ли записи в таблице
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT COUNT(*) AS cnt FROM offices")
-        else:
-            cur.execute("SELECT COUNT(*) AS cnt FROM offices")
-        
-        row = cur.fetchone()
-        count = row['cnt'] if row else 0
-
-        # Если таблица пустая — заполняем 10 офисов
-        if count == 0:
-            for i in range(1, 11):
-                price = random.randint(900, 1000)
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    cur.execute(
-                        "INSERT INTO offices (number, tenant, price) VALUES (%s, %s, %s)",
-                        (i, '', price)
-                    )
-                else:
-                    cur.execute(
-                        "INSERT INTO offices (number, tenant, price) VALUES (?, ?, ?)",
-                        (i, '', price)
-                    )
-    finally:
-        db_close(conn, cur)
+    cur.execute("SELECT COUNT(*) AS cnt FROM offices")
+    row = cur.fetchone()
+    count = row['cnt'] if row else 0
+    if count == 0:
+        for i in range(1, 11):
+            price = random.randint(900, 1000)
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute(
+                    "INSERT INTO offices (number, tenant, price) VALUES (%s, %s, %s)",
+                    (i, '', price)
+                )
+            else:
+                cur.execute(
+                    "INSERT INTO offices (number, tenant, price) VALUES (?, ?, ?)",
+                    (i, '', price)
+                )
+    db_close(conn, cur)
 
 
 @lab6.route('/lab6/')
@@ -133,35 +123,32 @@ def api():
     data = request.json
     id = data.get('id')
     method = data.get('method')
-
-    # ---------- метод info (без авторизации) ----------
+#если пользователь на авториз то 
     if method == 'info':
         conn, cur = db_connect()
-        try:
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
-            else:
-                cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
+        else:
+            cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
+        
+        rows = cur.fetchall()
+
+        offices = []
+        for row in rows:
+            offices.append({
+                'number': row['number'],
+                'tenant': row['tenant'],
+                'price': row['price']
+            })
             
-            rows = cur.fetchall()
+        db_close(conn, cur)
 
-            offices = []
-            for row in rows:
-                offices.append({
-                    'number': row['number'],
-                    'tenant': row['tenant'],
-                    'price': row['price']
-                })
+        return {
+            'jsonrpc': '2.0',
+            'result': offices,
+            'id': id
+        }
 
-            return {
-                'jsonrpc': '2.0',
-                'result': offices,
-                'id': id
-            }
-        finally:
-            db_close(conn, cur)
-
-    # все остальные методы требуют логина
     login = session.get('login')
     if not login:
         return {
@@ -172,150 +159,112 @@ def api():
             },
             'id': id
         }
-
+#бронирование
     if method == 'booking':
         office_number = data['params']
         conn, cur = db_connect()
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT tenant FROM offices WHERE number = %s", (office_number,))
+        else:
+            cur.execute("SELECT tenant FROM offices WHERE number = ?", (office_number,))
         
-        try:
-            # Проверяем, существует ли офис и занят ли он
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute("SELECT tenant FROM offices WHERE number = %s", (office_number,))
-            else:
-                cur.execute("SELECT tenant FROM offices WHERE number = ?", (office_number,))
-            
-            row = cur.fetchone()
+        row = cur.fetchone()
 
-            if not row:
-                db_close(conn, cur)
-                return {
-                    'jsonrpc': '2.0',
-                    'error': {
-                        'code': -32602,
-                        'message': 'Invalid params'
-                    },
-                    'id': id
-                }
-
-            tenant = row['tenant']
-
-            if tenant != '':
-                db_close(conn, cur)
-                return {
-                    'jsonrpc': '2.0',
-                    'error': {
-                        'code': 2,
-                        'message': 'Already booked'
-                    },
-                    'id': id
-                }
-
-            # Бронируем
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute(
-                    "UPDATE offices SET tenant = %s WHERE number = %s",
-                    (login, office_number)
-                )
-            else:
-                cur.execute(
-                    "UPDATE offices SET tenant = ? WHERE number = ?",
-                    (login, office_number)
-                )
-
-            db_close(conn, cur)
-            return {
-                'jsonrpc': '2.0',
-                'result': 'success',
-                'id': id
-            }
-        except Exception as e:
+        tenant = row['tenant']
+        if tenant != '':
             db_close(conn, cur)
             return {
                 'jsonrpc': '2.0',
                 'error': {
-                    'code': -32601,
-                    'message': 'Method not found'
+                    'code': 2,
+                    'message': 'Already booked'
                 },
                 'id': id
             }
 
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute(
+                "UPDATE offices SET tenant = %s WHERE number = %s",
+                (login, office_number)
+            )
+        else:
+            cur.execute(
+                "UPDATE offices SET tenant = ? WHERE number = ?",
+                (login, office_number)
+            )
+
+        db_close(conn, cur)
+        return {
+            'jsonrpc': '2.0',
+            'result': 'success',
+            'id': id
+        }
+#отмена брони
     elif method == 'cancellation':
         office_number = data['params']
         conn, cur = db_connect()
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT tenant FROM offices WHERE number = %s", (office_number,))
+        else:
+            cur.execute("SELECT tenant FROM offices WHERE number = ?", (office_number,))
         
-        try:
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute("SELECT tenant FROM offices WHERE number = %s", (office_number,))
-            else:
-                cur.execute("SELECT tenant FROM offices WHERE number = ?", (office_number,))
-            
-            row = cur.fetchone()
+        row = cur.fetchone()
 
-            if not row:
-                db_close(conn, cur)
-                return {
-                    'jsonrpc': '2.0',
-                    'error': {
-                        'code': -32602,
-                        'message': 'Invalid params'
-                    },
-                    'id': id
-                }
-
-            tenant = row['tenant']
-
-            # Офис не арендован
-            if tenant == '':
-                db_close(conn, cur)
-                return {
-                    'jsonrpc': '2.0',
-                    'error': {
-                        'code': 3,
-                        'message': 'Office not booked'
-                    },
-                    'id': id
-                }
-
-            # Офис арендован другим пользователем
-            if tenant != login:
-                db_close(conn, cur)
-                return {
-                    'jsonrpc': '2.0',
-                    'error': {
-                        'code': 4,
-                        'message': 'You cant cancel this booking'
-                    },
-                    'id': id
-                }
-
-            # Снимаем аренду
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute(
-                    "UPDATE offices SET tenant = %s WHERE number = %s",
-                    ('', office_number)
-                )
-            else:
-                cur.execute(
-                    "UPDATE offices SET tenant = ? WHERE number = ?",
-                    ('', office_number)
-                )
-
-            db_close(conn, cur)
-            return {
-                'jsonrpc': '2.0',
-                'result': 'success',
-                'id': id
-            }
-        except Exception as e:
+        if not row:
             db_close(conn, cur)
             return {
                 'jsonrpc': '2.0',
                 'error': {
-                    'code': -32601,
-                    'message': 'Method not found'
+                    'code': -32602,
+                    'message': 'Invalid params'
                 },
                 'id': id
             }
+
+        tenant = row['tenant']
+
+        #если оофис не арендован
+        if tenant == '':
+            db_close(conn, cur)
+            return {
+                'jsonrpc': '2.0',
+                'error': {
+                    'code': 3,
+                    'message': 'Office not booked'
+                },
+                'id': id
+            }
+
+        # Офис арендован другим пользователем
+        if tenant != login:
+            db_close(conn, cur)
+            return {
+                'jsonrpc': '2.0',
+                'error': {
+                    'code': 4,
+                    'message': 'You cant cancel this booking'
+                },
+                'id': id
+            }
+
+        # Снимаем аренду
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute(
+                "UPDATE offices SET tenant = %s WHERE number = %s",
+                ('', office_number)
+            )
+        else:
+            cur.execute(
+                "UPDATE offices SET tenant = ? WHERE number = ?",
+                ('', office_number)
+            )
+
+        db_close(conn, cur)
+        return {
+            'jsonrpc': '2.0',
+            'result': 'success',
+            'id': id
+        }
 
     return {
         'jsonrpc': '2.0',
