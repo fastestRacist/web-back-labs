@@ -126,10 +126,7 @@ def api():
 #если пользователь на авториз то 
     if method == 'info':
         conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
-        else:
-            cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
+        cur.execute("SELECT number, tenant, price FROM offices ORDER BY number")
         
         rows = cur.fetchall()
 
