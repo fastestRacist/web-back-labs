@@ -20,6 +20,32 @@
     .error-message {
         color: red;
     }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+    th {
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+        border: 1px solid black;
+        background: green ;
+    }
+
+    td {
+        padding: 12px 15px;
+        border: 1px solid black;
+        text-align: center;
+        background: lightgreen;
+    }
+
+    button {
+        padding: 8px 16px;
+        font-size: 14px;
+        margin-right: 5px;
+    }
 </style>
 {% endblock %}
 
@@ -42,12 +68,12 @@
     </script>
 
     <div>
-        <button onclick="addFilm()">Добавить фильм</button>
+        <button style="background: rgba(124, 196, 124, 0.493); border-radius: 10px;" onclick="addFilm()">Добавить фильм</button>
     </div>
 
     <div class="modal">
         <input type="hidden" id="id">
-        <label>
+        <label> 
             Название фильма на русском:
             <input type="text" id="title-ru">
         </label><br>
