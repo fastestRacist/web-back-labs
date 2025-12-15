@@ -168,11 +168,7 @@ def edit_article(article_id):
 def delete_article(article_id):
 
     article = articles.query.filter_by(id=article_id,login_id=current_user.id).first()
-    # Если статья не найдена или не принадлежит пользователю
-    if not article:
-        return redirect('/lab8/list')
     
-    # Удаляем статью
     db.session.delete(article)
     db.session.commit()
     
