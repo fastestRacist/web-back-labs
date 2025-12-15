@@ -35,7 +35,7 @@ if app.config['DB_TYPE'] == 'postgres':
         f'postgresql://{db_user}:{db_password}@{host_ip}:{host_port}/{db_name}'
 
 else:
-    dir_path = path.dirnam(path.realpath(__file__))
+    dir_path = path.dirname(path.realpath(__file__))
     db_path = path.join(dir_path, "egor_khobenkov_orm.db")
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
