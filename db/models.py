@@ -1,5 +1,6 @@
 from . import db
-class users(db.Model):
+from flask_login import UserMixin
+class users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     login = db.Column(db.String(30), nullable = False, unique = True)
     password = db.Column(db.String(162), nullable = False)
