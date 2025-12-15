@@ -28,7 +28,7 @@ if app.config['DB_TYPE'] == 'postgres':
     db_name = 'egor_khobenkov_orm'
     db_user = 'egor_khobenkov_orm'
     db_password = '123'
-    host_ip = '127.0.0.'
+    host_ip = '127.0.0.1'
     host_port = 5432
 
     app.config['SQLALCHEMY_DATABASE_URI'] = \
