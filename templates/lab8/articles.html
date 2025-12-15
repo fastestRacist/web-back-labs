@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <div style="border-radius: 15px; padding: 30px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%;">
+            <h1 style="text-align: center;">Статьи</h1>
+            {% if articles %}
+                {% for article in articles %}
+                    <div style="border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #b5ebeb;">
+                        <h2>{{ article.title }}</h2>
+                        <div style="background-color: white; padding-left: 15px; margin: 15px 0; border-radius: 10px;">
+                            <p>{{ article.article_text }}</p>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
+                            <a href="/lab8/delete/{{ article.id }}">Удалить</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; color: #666; padding: 40px;">
+                    <p>У вас пока нет статей</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

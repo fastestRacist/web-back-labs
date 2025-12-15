@@ -32,7 +32,7 @@ app.register_blueprint(lab6)
 app.register_blueprint(lab7)
 app.register_blueprint(lab8)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный ключ')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gigasecret key')
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'egor_khobenkov_orm'
