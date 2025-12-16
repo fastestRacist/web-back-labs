@@ -207,4 +207,4 @@ def gallery():
     for item in logos:
         item["img_url"] = url_for('static',
                                   filename=f'lab2/{item["pic"]}.jpg')
-    return render_template('cars.html', items=logos)
+    return render_template('/lab2/cars.html', items=logos)

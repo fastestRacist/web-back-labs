@@ -2,8 +2,102 @@
 
 {% block lab %}Лабораторная работа 9{% endblock %}
 
-{% block script %}{% endblock %}
-
 {% block main %}
-    <h1>Поздравления</h1>
+<h1>Новогодние подарки</h1>
+<p>Осталось коробок: {{ opened_left }}</p>
+
+{% if user.is_authenticated %}
+<button id="reset-btn">Дед Мороз</button>
+{% endif %}
+
+<div style="position:relative; height:600px; margin-top:30px;">
+
+{% set positions = [
+    (50,50),(300,80),(600,40),(200,200),(500,220),
+    (100,350),(400,360),(650,180),(750,320),(900,120)
+] %}
+
+{% for box in boxes %}
+<img src="/static/lab9/box{{ box.id }}.png"
+     class="box"
+     data-id="{{ box.id }}"
+     style="position:absolute;
+            left:{{ positions[loop.index0][0] }}px;
+            top:{{ positions[loop.index0][1] }}px;
+            width:100px;
+            cursor:pointer;
+            {% if box.opened %}opacity:0.3{% endif %}">
+{% endfor %}
+</div>
+
+<!-- MODAL -->
+<div id="modal" style="display:none; position:fixed; inset:0;
+background:rgba(0,0,0,.6);">
+<div style="background:white; width:400px;
+margin:100px auto; padding:20px;
+border-radius:15px; text-align:center;">
+    <h2 id="modal-text"></h2>
+    <img id="modal-img" width="250"><br><br>
+    <button id="take-btn">Забрать</button>
+</div>
+</div>
+
+<script>
+let currentBox = null;
+
+// Получаем элементы DOM
+const takeBtn = document.getElementById('take-btn');
+const modal = document.getElementById('modal');
+const modalText = document.getElementById('modal-text');
+const modalImg = document.getElementById('modal-img');
+
+document.querySelectorAll('.box').forEach(box => {
+    box.onclick = () => {
+        const id = box.dataset.id;
+        fetch(`/lab9/open/${id}`, {method:'POST'})
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                currentBox = id;
+                modal.style.display='block';
+                modalText.innerText = data.text;
+                modalImg.src = data.gift_img;
+            } else if (data.status === 'auth_required') {
+                alert('Требуется авторизация');
+            } else if (data.status === 'limit') {
+                alert('Можно открыть только 3 коробки');
+            } else {
+                alert('Коробка пуста');
+            }
+        });
+    }
+});
+
+takeBtn.onclick = () => {
+    fetch(`/lab9/take/${currentBox}`, {method:'POST'})
+    .then(() => {
+        modal.style.display='none';
+        location.reload();
+    });
+};
+
+const resetBtn = document.getElementById('reset-btn');
+if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+        fetch('/lab9/reset', { method: 'POST' })
+            .then(r => {
+                if (r.status === 401) {
+                    alert('Требуется авторизация');
+                    return;
+                }
+                return r.json();
+            })
+            .then(data => {
+                if (data && data.status === 'reset') {
+                    location.reload();
+                }
+            });
+    });
+}
+</script>
 {% endblock %}

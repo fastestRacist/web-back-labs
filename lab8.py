@@ -186,13 +186,13 @@ def public_articles():
 def search_my_articles():
     search = request.args.get('search', '').strip()
 
-    # если строка поиска пустая — возвращаемся к списку
+    #если строка поиска пустая — возвращаемся к списку
     if not search:
         return redirect('/lab8/list')
 
     found_articles = articles.query.filter(
     articles.login_id == current_user.id,
-    articles.title.ilike(f'%{search}%')   # <-- ILIKE регистронезависимый
+    articles.title.ilike(f'%{search}%')
     ).order_by(articles.id.desc()).all()
 
     return render_template(
@@ -209,8 +209,6 @@ def search_public_articles():
     if not search:
         return redirect('/lab8/public')
 
-
-    # join с таблицей users, чтобы получить логин автора
     found_articles = articles.query.filter(
     articles.is_public == True,
     articles.title.ilike(f'%{search}%')
