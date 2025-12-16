@@ -191,8 +191,8 @@ def search_my_articles():
         return redirect('/lab8/list')
 
     found_articles = articles.query.filter(
-        articles.login_id == current_user.id,
-        func.lower(articles.title).like(f'%{search.lower()}%')
+    articles.login_id == current_user.id,
+    articles.title.ilike(f'%{search}%')   # <-- ILIKE регистронезависимый
     ).order_by(articles.id.desc()).all()
 
     return render_template(
@@ -212,16 +212,14 @@ def search_public_articles():
 
     # join с таблицей users, чтобы получить логин автора
     found_articles = articles.query.filter(
-        articles.is_public == True,
-        func.lower(articles.title).like(f'%{search.lower()}%')
-    ).join(
-        users, articles.login_id == users.id
-    ).add_columns(
+    articles.is_public == True,
+    articles.title.ilike(f'%{search}%')
+    ).join(users, articles.login_id == users.id).add_columns(
         articles.id,
         articles.title,
         articles.article_text,
         articles.is_public,
-        users.login.label('author')  # имя автора
+        users.login.label('author')
     ).order_by(articles.id.desc()).all()
 
     return render_template(
