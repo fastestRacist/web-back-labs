@@ -4,32 +4,31 @@
 
 {% block main %}
     <div style="display: flex; justify-content: center; align-items: center;">
-        <div style="border-radius: 15px; padding: 30px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%;">
-            <h1 style="text-align: center;">Статьи</h1>
+        <div style="border-radius: 15px; padding: 30px; background: white; width: 80%;">
+            <h1 style="text-align: center;">Публичные статьи</h1>
             <div style="text-align: center; margin-bottom: 30px;">
-                <form action="{{ url_for('lab8.search_my_articles') }}" method="GET" style="display: inline-block;">
+                <form action="{{ url_for('lab8.search_public_articles') }}" method="GET" style="display: inline-block;">
                     <input type="text" name="search" style="width: 300px; padding: 8px;">
                     <button type="submit" style="padding: 8px 15px; background-color: #b5ebeb; margin-left: 5px;">
                         Найти
                     </button>
                 </form>
+                </form>
             </div>
             {% if articles %}
                 {% for article in articles %}
                     <div style="border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #b5ebeb;">
-                        <h2>{{ article.title }}</h2>
                         <div style="background-color: white; padding-left: 15px; margin: 15px 0; border-radius: 10px;">
-                            <p>{{ article.article_text }}</p>
+                            <h2>{{ article.title }}</h2> Автор: {{ article.author }}
                         </div>
-                        <div style="text-align: right; margin-top: 10px;">
-                            <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
-                            <a href="/lab8/delete/{{ article.id }}">Удалить</a>
+                        <div style="background-color: white; padding: 2px; margin: 15px 0; border-radius: 10px;">
+                            <p>{{ article.article_text }}</p>
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
                 <div style="text-align: center; color: #666; padding: 40px;">
-                    <p>У вас пока нет статей</p>
+                    <p>Пока нет публичных статей</p>
                 </div>
             {% endif %}
         </div>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+<p>Запрос: <b>{{ search }}</b></p>
+    {% if articles %}
+        {% for article in articles %}
+            <div style="border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #b5ebeb;">
+                <h2>{{ article.title }}</h2> Автор: {{ article.author }}
+                <div style="background-color: white; padding-left: 15px; margin: 15px 0; border-radius: 10px;">
+                    <p>{{ article.article_text }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Ничего не найдено</p>
+    {% endif %}
+{% endblock %}

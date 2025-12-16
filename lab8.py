@@ -7,6 +7,7 @@ from os import path
 from db import db
 from db.models import users, articles
 from flask_login import login_user, login_required, current_user, logout_user
+from sqlalchemy import func
 
 from datetime import datetime
 
@@ -138,10 +139,6 @@ def edit_article(article_id):
     #поиск статьи
     article = articles.query.filter_by(id=article_id,login_id=current_user.id).first()
     
-    # Если статья не найдена или не принадлежит пользователю
-    if not article:
-        return redirect('/lab8/list')
-    
     if request.method == 'GET':
         return render_template('lab8/edit_article.html', article=article)
     
@@ -173,3 +170,62 @@ def delete_article(article_id):
     db.session.commit()
     
     return redirect('/lab8/list')
+
+
+@lab8.route('/lab8/public')
+def public_articles():
+    public_articles = articles.query.filter_by(is_public=True).join(
+        users, articles.login_id == users.id).add_columns(articles.id, articles.title, articles.article_text,
+        articles.is_public, users.login.label('author')).order_by(articles.id.desc()).all()
+    
+    return render_template('lab8/public_articles.html', articles=public_articles, login=session.get('login'))
+
+
+@lab8.route('/lab8/search')
+@login_required
+def search_my_articles():
+    search = request.args.get('search', '').strip()
+
+    # если строка поиска пустая — возвращаемся к списку
+    if not search:
+        return redirect('/lab8/list')
+
+    found_articles = articles.query.filter(
+        articles.login_id == current_user.id,
+        func.lower(articles.title).like(f'%{search.lower()}%')
+    ).order_by(articles.id.desc()).all()
+
+    return render_template(
+        'lab8/search_results.html',
+        search=search,
+        articles=found_articles
+    )
+
+
+@lab8.route('/lab8/public_search')
+def search_public_articles():
+    search = request.args.get('search', '').strip()
+
+    if not search:
+        return redirect('/lab8/public')
+
+
+    # join с таблицей users, чтобы получить логин автора
+    found_articles = articles.query.filter(
+        articles.is_public == True,
+        func.lower(articles.title).like(f'%{search.lower()}%')
+    ).join(
+        users, articles.login_id == users.id
+    ).add_columns(
+        articles.id,
+        articles.title,
+        articles.article_text,
+        articles.is_public,
+        users.login.label('author')  # имя автора
+    ).order_by(articles.id.desc()).all()
+
+    return render_template(
+        'lab8/public_search_results.html',
+        search=search,
+        articles=found_articles
+    )
