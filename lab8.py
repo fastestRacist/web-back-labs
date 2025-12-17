@@ -7,7 +7,6 @@ from os import path
 from db import db
 from db.models import users, articles
 from flask_login import login_user, login_required, current_user, logout_user
-from sqlalchemy import func
 
 from datetime import datetime
 
@@ -121,7 +120,7 @@ def create():
 
     user = current_user
         
-        # Создаем новую статью
+        #создаем новую статью
     new_article = articles(login_id=user.id, 
                            title=title,
                            article_text=article_text, 
