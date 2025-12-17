@@ -21,3 +21,5 @@ class GiftBox(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     opened = db.Column(db.Boolean, default=False, nullable=False)
+
+

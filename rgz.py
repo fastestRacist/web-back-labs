@@ -15,7 +15,7 @@ def create_rgz_tables():
             CREATE TABLE IF NOT EXISTS rgz_users (
                 id SERIAL PRIMARY KEY,
                 login VARCHAR(100) UNIQUE NOT NULL,
-                password VARCHAR(100) NOT NULL,
+                password VARCHAR(255) NOT NULL,
                 is_admin BOOLEAN DEFAULT FALSE
             )
         """)
@@ -33,11 +33,20 @@ def create_rgz_tables():
         """)
         
         # Добавляем администратора
-        cur.execute("""
-            INSERT INTO rgz_users (login, password, is_admin) 
-            VALUES ('admin', 'admin', TRUE)
-            ON CONFLICT (login) DO NOTHING
-        """)
+        admin_password_hashed = generate_password_hash('admin')
+
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("""
+                INSERT INTO rgz_users (login, password, is_admin) 
+                VALUES ('admin', %s, TRUE)
+                ON CONFLICT (login) DO NOTHING
+            """, (admin_password_hashed,))
+        else:
+            cur.execute("""
+                INSERT OR IGNORE INTO rgz_users (login, password, is_admin) 
+                VALUES ('admin', ?, 1)
+            """, (admin_password_hashed,))
+            
     else:  # SQLite
         cur.execute("""
             CREATE TABLE IF NOT EXISTS rgz_users (
@@ -59,11 +68,6 @@ def create_rgz_tables():
             )
         """)
         
-        # Добавляем администратора
-        cur.execute("""
-            INSERT OR IGNORE INTO rgz_users (login, password, is_admin) 
-            VALUES ('admin', 'admin', 1)
-        """)
     
     conn.commit()
     db_close(conn, cur)
@@ -801,110 +805,114 @@ def api():
         'id': id
     }
 
-#вход
 
-@rgz.route('/rgz/login', methods=['GET', 'POST'])
-def login_page():
-    """HTML страница входа"""
+@rgz.route('/rgz/register', methods=['GET', 'POST'])
+def register_page():
     if request.method == 'GET':
-        return render_template('rgz/login.html')
-    
-    login = request.form.get('login')
-    password = request.form.get('password')
+        return render_template('rgz/register.html')  # твоя форма регистрации
 
-    if not (login and password):
-        return render_template('rgz/login.html', error='Заполните все поля')
-    
+    # POST: обработка формы
+    login = request.form.get('login', '').strip()
+    password = request.form.get('password', '').strip()
+
+    # Простейшая валидация
+    if not login or not password:
+        return render_template('rgz/register.html', error='Заполните все поля')
+
+    # Здесь можно вызвать ту же логику, что и в JSON-RPC методе 'register'
+    from flask import current_app
     conn, cur = db_connect()
+    
+    # Проверяем, есть ли уже такой пользователь
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT * FROM rgz_users WHERE login = %s AND password = %s", (login, password))
+        cur.execute("SELECT id FROM rgz_users WHERE login = %s", (login,))
     else:
-        cur.execute("SELECT * FROM rgz_users WHERE login = ? AND password = ?", (login, password))
+        cur.execute("SELECT id FROM rgz_users WHERE login = ?", (login,))
     
-    user = cur.fetchone()
-
-    if not user:
+    if cur.fetchone():
         db_close(conn, cur)
-        return render_template('rgz/login.html', error='Логин и/или пароль неверны')
+        return render_template('rgz/register.html', error='Пользователь с таким логином уже существует')
     
-    session['login'] = login
-    session['is_admin'] = bool(user['is_admin'])
+    # Хэшируем пароль
+    from werkzeug.security import generate_password_hash
+    hashed_password = generate_password_hash(password)
     
+    # Добавляем пользователя
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute(
+            "INSERT INTO rgz_users (login, password, is_admin) VALUES (%s, %s, %s)",
+            (login, hashed_password, False)
+        )
+    else:
+        cur.execute(
+            "INSERT INTO rgz_users (login, password, is_admin) VALUES (?, ?, ?)",
+            (login, hashed_password, 0)
+        )
+    conn.commit()
     db_close(conn, cur)
+
+    # Авто-вход
+    session['login'] = login
+    session['is_admin'] = False
     return redirect('/rgz/')
 
-@rgz.route('/register', methods=['GET', 'POST'])
-def register_page():
-    error = None
 
-    if request.method == 'POST':
-        login = request.form.get('login', '').strip()
-        password = request.form.get('password', '').strip()
+#вход
+@rgz.route('/rgz/login', methods=['GET', 'POST'])
+def login_page():
+    if request.method == 'GET':
+        return render_template('rgz/login.html')
 
-        # Проверки
-        if not login or not password:
-            error = 'Заполните все поля'
-        elif len(login) < 3:
-            error = 'Логин должен быть не короче 3 символов'
-        elif len(password) < 4:
-            error = 'Пароль должен быть не короче 4 символов'
-        else:
-            user = User.query.filter_by(login=login).first()
-            if user:
-                error = 'Пользователь с таким логином уже существует'
-            else:
-                password_hash = generate_password_hash(password)
+    login = request.form.get('login', '').strip()
+    password = request.form.get('password', '').strip()
 
-                new_user = User(
-                    login=login,
-                    password=password_hash,
-                    is_admin=False
-                )
-                db.session.add(new_user)
-                db.session.commit()
+    if not login or not password:
+        return render_template('rgz/login.html', error='Заполните все поля')
 
-                session['login'] = login
-                session['is_admin'] = False
-                return redirect(url_for('rgz.books_page'))
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM rgz_users WHERE login=%s", (login,))
+    else:
+        cur.execute("SELECT * FROM rgz_users WHERE login=?", (login,))
+    user = cur.fetchone()
+    db_close(conn, cur)
 
-    return render_template('/rgz/register.html', error=error)
+    if not user or not check_password_hash(user['password'], password):
+        return render_template('rgz/login.html', error='Логин и/или пароль неверны')
+
+    session['login'] = login
+    session['is_admin'] = bool(user['is_admin'])
+    return redirect('/rgz/')
 
 @rgz.route('/rgz/logout')
 def logout_page():
-    """Выход из системы"""
     session.pop('login', None)
     session.pop('is_admin', None)
     return redirect('/rgz/')
 
+
 @rgz.route('/rgz/delete_account')
 def delete_account_page():
-    """Удаление аккаунта"""
     login = session.get('login')
     if not login:
         return redirect('/rgz/login')
-    
+
     conn, cur = db_connect()
-    
-    # Проверяем, не администратор ли
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT is_admin FROM rgz_users WHERE login = %s", (login,))
+        cur.execute("SELECT is_admin FROM rgz_users WHERE login=%s", (login,))
     else:
-        cur.execute("SELECT is_admin FROM rgz_users WHERE login = ?", (login,))
-    
+        cur.execute("SELECT is_admin FROM rgz_users WHERE login=?", (login,))
     user = cur.fetchone()
-    
     if user and not bool(user['is_admin']):
         if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("DELETE FROM rgz_users WHERE login = %s", (login,))
+            cur.execute("DELETE FROM rgz_users WHERE login=%s", (login,))
         else:
-            cur.execute("DELETE FROM rgz_users WHERE login = ?", (login,))
-    
-    conn.commit()
+            cur.execute("DELETE FROM rgz_users WHERE login=?", (login,))
+        conn.commit()
     db_close(conn, cur)
-    
+
     session.pop('login', None)
     session.pop('is_admin', None)
-    
     return redirect('/rgz/')
 
 @rgz.route('/rgz/recreate')
