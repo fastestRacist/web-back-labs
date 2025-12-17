@@ -61,7 +61,7 @@ def create_rgz_tables():
                 logo TEXT
             )
         """)
-        
+
         admin_password_hashed = generate_password_hash('admin')
 
         cur.execute("""
@@ -72,7 +72,6 @@ def create_rgz_tables():
     
     conn.commit()
     db_close(conn, cur)
-
 def check_and_init_rgz():
     """Проверяем и при необходимости заполняем таблицы РГЗ реальными книгами"""
     conn, cur = db_connect()
