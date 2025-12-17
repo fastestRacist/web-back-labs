@@ -4,6 +4,7 @@
 
 {% block main %}
 <h1>Новогодние подарки</h1>
+<p>Осталось коробок: {{ opened_left }}</p>
 
 {% if user.is_authenticated %}
 <button id="reset-btn">Дед Мороз</button>
@@ -70,15 +71,15 @@ document.querySelectorAll('.box').forEach(box => {
         });
     }
 });
-//кнопка забрать поадрок
+
 takeBtn.onclick = () => {
     fetch(`/lab9/take/${currentBox}`, {method:'POST'})
     .then(() => {
         modal.style.display='none';
-        // location.reload();
+        location.reload();
     });
 };
-//кнопка дед мороз
+
 const resetBtn = document.getElementById('reset-btn');
 if (resetBtn) {
     resetBtn.addEventListener('click', () => {
@@ -92,7 +93,7 @@ if (resetBtn) {
             })
             .then(data => {
                 if (data && data.status === 'reset') {
-                    // location.reload();
+                    location.reload();
                 }
             });
     });
