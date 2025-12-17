@@ -99,4 +99,16 @@ if (resetBtn) {
     });
 }
 </script>
+<style>
+        .box {
+            transition: opacity 0.3s ease; /* Плавное изменение прозрачности */
+        }
+
+        .box.opened {
+            opacity: 0.3 !important;
+            pointer-events: none; /* Отключаем клики на открытой коробке */
+            cursor: default;
+        }
+       
+</style>
 {% endblock %}
