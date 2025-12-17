@@ -71,7 +71,7 @@ document.querySelectorAll('.box').forEach(box => {
         });
     }
 });
-
+//кнопка забрать поадрок
 takeBtn.onclick = () => {
     fetch(`/lab9/take/${currentBox}`, {method:'POST'})
     .then(() => {
@@ -79,7 +79,7 @@ takeBtn.onclick = () => {
         // location.reload();
     });
 };
-
+//кнопка дед мороз
 const resetBtn = document.getElementById('reset-btn');
 if (resetBtn) {
     resetBtn.addEventListener('click', () => {
