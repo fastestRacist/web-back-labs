@@ -18,7 +18,7 @@ CONGRATS = {
     10: "Ледники растают!"
 }
 
-# Коробки, доступные только для авторизованных пользователей
+#коробки, доступные только тем кто вошел
 LOGIN_ONLY = {8, 9, 10}
 
 
@@ -38,22 +38,18 @@ def index():
 def open_box(box_id):
     box = GiftBox.query.get_or_404(box_id)
 
-    # Проверка авторизации для специальных коробок
+    #Проверка авторизации для специальных коробок
     if box_id in LOGIN_ONLY and not current_user.is_authenticated:
         return jsonify({'status': 'auth_required'})
-
-    # Список открытых коробок для текущего пользователя
+    #Список открытых коробок для текущего пользователя
     user_key = f"opened_boxes_user_{current_user.get_id() if current_user.is_authenticated else 'guest'}"
     opened = session.get(user_key, [])
-
     if box_id in opened:
         return jsonify({'status': 'already_opened'})
-
-    # Лимит 3 коробки на пользователя
+    #Лимит 3 коробки на пользователя
     if len(opened) >= 3:
         return jsonify({'status': 'limit'})
-
-    # Если коробка уже глобально открыта, показываем содержимое
+    #Если коробка уже глобально открыта, показываем содержимое
     status = 'ok' if not box.opened else 'empty'
 
     return jsonify({
@@ -66,8 +62,7 @@ def open_box(box_id):
 @lab9.route('/lab9/take/<int:box_id>', methods=['POST'])
 def take_gift(box_id):
     box = GiftBox.query.get_or_404(box_id)
-
-    # Если коробка ещё не открыта глобально, помечаем её как открытую
+    #Если коробка ещё не открыта глобально, помечаем её как открытую
     if not box.opened:
         box.opened = True
         db.session.commit()
@@ -83,15 +78,13 @@ def take_gift(box_id):
 
 @lab9.route('/lab9/reset', methods=['POST'])
 def reset_boxes():
-    # Только для авторизованных пользователей
+    #Только для авторизованных пользователей
     if not current_user.is_authenticated:
         return jsonify({'status': 'auth_required'}), 401
-
-    # Сбрасываем глобальный статус коробок
+    #Сбрасываем глобальный статус коробок
     GiftBox.query.update({GiftBox.opened: False})
     db.session.commit()
-
-    # Сбрасываем индивидуальные открытые коробки для текущего пользователя
+    #Сбрасываем индивидуальные открытые коробки для текущего пользователя
     user_key = f"opened_boxes_user_{current_user.get_id()}"
     session[user_key] = []
 
