@@ -43,10 +43,10 @@ def create_rgz_tables():
             """, (admin_password_hashed,))
         else:
             cur.execute("""
-                INSERT OR IGNORE INTO rgz_users (login, password, is_admin) 
+                INSERT INTO rgz_users (login, password, is_admin) 
                 VALUES ('admin', ?, 1)
             """, (admin_password_hashed,))
-            
+
     else:  # SQLite
         cur.execute("""
             CREATE TABLE IF NOT EXISTS rgz_users (
