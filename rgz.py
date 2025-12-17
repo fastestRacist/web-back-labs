@@ -35,17 +35,11 @@ def create_rgz_tables():
         # Добавляем администратора
         admin_password_hashed = generate_password_hash('admin')
 
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                INSERT INTO rgz_users (login, password, is_admin) 
-                VALUES ('admin', %s, TRUE)
-                ON CONFLICT (login) DO NOTHING
-            """, (admin_password_hashed,))
-        else:
-            cur.execute("""
-                INSERT INTO rgz_users (login, password, is_admin) 
-                VALUES ('admin', ?, 1)
-            """, (admin_password_hashed,))
+        cur.execute("""
+            INSERT INTO rgz_users (login, password, is_admin) 
+            VALUES ('admin', %s, TRUE)
+            ON CONFLICT (login) DO NOTHING
+        """, (admin_password_hashed,))
 
     else:  # SQLite
         cur.execute("""
@@ -67,6 +61,13 @@ def create_rgz_tables():
                 logo TEXT
             )
         """)
+        
+        admin_password_hashed = generate_password_hash('admin')
+
+        cur.execute("""
+            INSERT INTO rgz_users (login, password, is_admin) 
+            VALUES ('admin', ?, 1)
+        """, (admin_password_hashed,))
         
     
     conn.commit()
