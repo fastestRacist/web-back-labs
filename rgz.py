@@ -64,10 +64,12 @@ def create_rgz_tables():
 
         admin_password_hashed = generate_password_hash('admin')
 
-        cur.execute("""
-            INSERT INTO rgz_users (login, password, is_admin) 
-            VALUES ('admin', ?, 1)
-        """, (admin_password_hashed,))
+        cur.execute("SELECT id FROM rgz_users WHERE login = 'admin'")
+        if not cur.fetchone():
+            cur.execute(
+                "INSERT INTO rgz_users (login, password, is_admin) VALUES (?, ?, ?)",
+                ('admin', admin_password_hashed, 1)
+            )
         
     
     conn.commit()
