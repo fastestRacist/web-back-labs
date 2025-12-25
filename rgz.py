@@ -39,22 +39,22 @@ def api():
         qparams = []
 
         if title:
-            query += " AND title LIKE %s"
+            query += " AND title LIKE ?"
             qparams.append(f"%{title}%")
         if author:
-            query += " AND author LIKE %s"
+            query += " AND author LIKE ?"
             qparams.append(f"%{author}%")
         if publisher:
-            query += " AND publisher LIKE %s"
+            query += " AND publisher LIKE ?"
             qparams.append(f"%{publisher}%")
         if min_pages:
-            query += " AND pages >= %s"
+            query += " AND pages >= ?"
             qparams.append(int(min_pages))
         if max_pages:
-            query += " AND pages <= %s"
+            query += " AND pages <= ?"
             qparams.append(int(max_pages))
 
-        query += f" ORDER BY {sort_by} {sort_order} LIMIT %s OFFSET %s"
+        query += f" ORDER BY {sort_by} {sort_order} LIMIT ? OFFSET ?"
         qparams.extend([limit, (page-1)*limit])
         cur.execute(query, qparams)
         rows = cur.fetchall()
@@ -73,11 +73,11 @@ def api():
         # общее количество
         count_query = "SELECT COUNT(*) as cnt FROM rgz_books WHERE 1=1"
         count_params = []
-        if title: count_query += " AND title LIKE %s"; count_params.append(f"%{title}%")
-        if author: count_query += " AND author LIKE %s"; count_params.append(f"%{author}%")
-        if publisher: count_query += " AND publisher LIKE %s"; count_params.append(f"%{publisher}%")
-        if min_pages: count_query += " AND pages >= %s"; count_params.append(int(min_pages))
-        if max_pages: count_query += " AND pages <= %s"; count_params.append(int(max_pages))
+        if title: count_query += " AND title LIKE ?"; count_params.append(f"%{title}%")
+        if author: count_query += " AND author LIKE ?"; count_params.append(f"%{author}%")
+        if publisher: count_query += " AND publisher LIKE ?"; count_params.append(f"%{publisher}%")
+        if min_pages: count_query += " AND pages >= ?"; count_params.append(int(min_pages))
+        if max_pages: count_query += " AND pages <= ?"; count_params.append(int(max_pages))
         cur.execute(count_query, count_params)
         total = cur.fetchone()['cnt']
 
@@ -94,12 +94,12 @@ def api():
             return {'jsonrpc':'2.0','error':{'code':2,'message':'Пароль слишком короткий'},'id':id_}
 
         conn, cur = db_connect()
-        cur.execute("SELECT id FROM rgz_users WHERE login=%s", (login,))
+        cur.execute("SELECT id FROM rgz_users WHERE login=?", (login,))
         if cur.fetchone():
             db_close(conn, cur)
             return {'jsonrpc':'2.0','error':{'code':3,'message':'Пользователь существует'},'id':id_}
         hashed = generate_password_hash(password)
-        cur.execute("INSERT INTO rgz_users (login,password,is_admin) VALUES (%s,%s,%s)",(login,hashed,0))
+        cur.execute("INSERT INTO rgz_users (login,password,is_admin) VALUES (?,?,?)",(login,hashed,0))
         conn.commit()
         db_close(conn, cur)
         session['login']=login
@@ -111,7 +111,7 @@ def api():
         login=params.get('login','').strip()
         password=params.get('password','').strip()
         conn, cur=db_connect()
-        cur.execute("SELECT * FROM rgz_users WHERE login=%s",(login,))
+        cur.execute("SELECT * FROM rgz_users WHERE login=?",(login,))
         user = cur.fetchone()
         db_close(conn, cur)
         if not user or not check_password_hash(user['password'], password):
@@ -131,12 +131,12 @@ def api():
         login=session.get('login')
         if not login: return {'jsonrpc':'2.0','error':{'code':1,'message':'Не авторизован'},'id':id_}
         conn, cur=db_connect()
-        cur.execute("SELECT is_admin FROM rgz_users WHERE login=%s",(login,))
+        cur.execute("SELECT is_admin FROM rgz_users WHERE login=?",(login,))
         user=cur.fetchone()
         if user['is_admin']:
             db_close(conn,cur)
             return {'jsonrpc':'2.0','error':{'code':2,'message':'Нельзя удалить админа'},'id':id_}
-        cur.execute("DELETE FROM rgz_users WHERE login=%s",(login,))
+        cur.execute("DELETE FROM rgz_users WHERE login=?",(login,))
         conn.commit()
         db_close(conn,cur)
         session.pop('login',None)
@@ -154,14 +154,14 @@ def api():
         if method=='add_book':
             title=params['title']; author=params['author']; pages=int(params['pages']); publisher=params['publisher']
             if pages<=0: return {'jsonrpc':'2.0','error':{'code':2,'message':'Страницы>0'},'id':id_}
-            cur.execute("INSERT INTO rgz_books (title,author,pages,publisher) VALUES (%s,%s,%s,%s)",(title,author,pages,publisher))
+            cur.execute("INSERT INTO rgz_books (title,author,pages,publisher) VALUES (?,?,?,?)",(title,author,pages,publisher))
         elif method=='update_book':
             book_id=int(params['id']); title=params['title']; author=params['author']; pages=int(params['pages']); publisher=params['publisher']
             if pages<=0: return {'jsonrpc':'2.0','error':{'code':2,'message':'Страницы>0'},'id':id_}
-            cur.execute("UPDATE rgz_books SET title=%s,author=%s,pages=%s,publisher=%s WHERE id=%s",(title,author,pages,publisher,book_id))
+            cur.execute("UPDATE rgz_books SET title=?,author=?,pages=?,publisher=? WHERE id=?",(title,author,pages,publisher,book_id))
         else:  # delete_book
             book_id=int(params)
-            cur.execute("DELETE FROM rgz_books WHERE id=%s",(book_id,))
+            cur.execute("DELETE FROM rgz_books WHERE id=?",(book_id,))
         conn.commit()
         db_close(conn,cur)
         return {'jsonrpc':'2.0','result':'success','id':id_}
