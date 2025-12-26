@@ -7,18 +7,16 @@ rgz = Blueprint('rgz', __name__)
 
 @rgz.route('/rgz/')
 def main():
-    """Главная страница — просто HTML, весь функционал через JSON-RPC"""
     return render_template('rgz/books.html', login=session.get('login'), is_admin=session.get('is_admin', False))
 
 @rgz.route('/rgz/json-rpc-api/', methods=['POST'])
 def api():
-    """Полностью JSON-RPC API для всех действий"""
     data = request.json
     id_ = data.get('id')
     method = data.get('method')
     params = data.get('params', {})
 
-    # ===== GET BOOKS =====
+    #вывод книг
     if method == 'get_books':
         page = int(params.get('page', 1))
         limit = 20
@@ -35,6 +33,7 @@ def api():
         if sort_order not in ['asc','desc']: sort_order='asc'
 
         conn, cur = db_connect()
+        #ввод фильтров
         query = "SELECT * FROM rgz_books WHERE 1=1"
         qparams = []
 
@@ -53,7 +52,7 @@ def api():
         if max_pages:
             query += " AND pages <= ?"
             qparams.append(int(max_pages))
-
+        #пагинация
         query += f" ORDER BY {sort_by} {sort_order} LIMIT ? OFFSET ?"
         qparams.extend([limit, (page-1)*limit])
         cur.execute(query, qparams)
@@ -70,7 +69,7 @@ def api():
                 'image': f"/static/rgz/{r['id']}.jpg"
             })
 
-        # общее количество
+        #
         count_query = "SELECT COUNT(*) as cnt FROM rgz_books WHERE 1=1"
         count_params = []
         if title: count_query += " AND title LIKE ?"; count_params.append(f"%{title}%")
@@ -84,7 +83,7 @@ def api():
         db_close(conn, cur)
         return {'jsonrpc':'2.0','result':{'books':books,'page':page,'total_pages':(total+limit-1)//limit},'id':id_}
 
-    # ===== REGISTER =====
+    #регистрация
     if method == 'register':
         login = params.get('login','').strip()
         password = params.get('password','').strip()
@@ -106,7 +105,7 @@ def api():
         session['is_admin']=False
         return {'jsonrpc':'2.0','result':{'login':login,'is_admin':False},'id':id_}
 
-    # ===== LOGIN =====
+    #вход
     if method=='login':
         login=params.get('login','').strip()
         password=params.get('password','').strip()
@@ -120,13 +119,13 @@ def api():
         session['is_admin']=bool(user['is_admin'])
         return {'jsonrpc':'2.0','result':{'login':login,'is_admin':bool(user['is_admin'])},'id':id_}
 
-    # ===== LOGOUT =====
+    #выход
     if method=='logout':
         session.pop('login',None)
         session.pop('is_admin',None)
         return {'jsonrpc':'2.0','result':'success','id':id_}
 
-    # ===== DELETE ACCOUNT =====
+    #удаление аккаунта
     if method=='delete_account':
         login=session.get('login')
         if not login: return {'jsonrpc':'2.0','error':{'code':1,'message':'Не авторизован'},'id':id_}
@@ -143,28 +142,28 @@ def api():
         session.pop('is_admin',None)
         return {'jsonrpc':'2.0','result':'success','id':id_}
 
-    # ===== USER INFO =====
+    #информация о том кто зашел
     if method=='get_user_info':
         return {'jsonrpc':'2.0','result':{'is_authenticated':bool(session.get('login')),'login':session.get('login'),'is_admin':session.get('is_admin',False)},'id':id_}
 
-    # ===== ADMIN CRUD =====
+    #для админа
     if method in ['add_book','update_book','delete_book']:
         if not session.get('is_admin'): return {'jsonrpc':'2.0','error':{'code':1,'message':'Только для админа'},'id':id_}
         conn, cur = db_connect()
-        if method=='add_book':
+        if method=='add_book': #добавить книгу
             title=params['title']; author=params['author']; pages=int(params['pages']); publisher=params['publisher']
             if pages<=0: return {'jsonrpc':'2.0','error':{'code':2,'message':'Страницы>0'},'id':id_}
             cur.execute("INSERT INTO rgz_books (title,author,pages,publisher) VALUES (?,?,?,?)",(title,author,pages,publisher))
-        elif method=='update_book':
+        elif method=='update_book': #редактирование книги
             book_id=int(params['id']); title=params['title']; author=params['author']; pages=int(params['pages']); publisher=params['publisher']
             if pages<=0: return {'jsonrpc':'2.0','error':{'code':2,'message':'Страницы>0'},'id':id_}
             cur.execute("UPDATE rgz_books SET title=?,author=?,pages=?,publisher=? WHERE id=?",(title,author,pages,publisher,book_id))
-        else:  # delete_book
+        else:  #удаление книги
             book_id=int(params)
             cur.execute("DELETE FROM rgz_books WHERE id=?",(book_id,))
         conn.commit()
         db_close(conn,cur)
         return {'jsonrpc':'2.0','result':'success','id':id_}
 
-    # ===== METHOD NOT FOUND =====
+    #метод не найден
     return {'jsonrpc':'2.0','error':{'code':-32601,'message':'Method not found'},'id':id_}

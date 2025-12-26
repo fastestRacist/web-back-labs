@@ -240,7 +240,7 @@ async function rpc(method, params={}) {
 let currentPage=1;
 let editBookId=null;
 let isAdmin=false;
-
+//приветствие пользователя
 async function getUser(){
     const res = await rpc('get_user_info');
     const userBlock = document.getElementById('user-block');
@@ -258,7 +258,7 @@ async function getUser(){
         isAdmin=false;
     }
 }
-
+//вывод книг
 async function loadBooks(page=1){
     currentPage=page;
     const title=document.getElementById('filter-title').value;
@@ -268,21 +268,21 @@ async function loadBooks(page=1){
     const max_pages=document.getElementById('filter-max-pages').value;
     const sort_by=document.getElementById('sort-by').value;
     const sort_order=document.getElementById('sort-order').value;
-
+    //получаю книги
     const res = await rpc('get_books',{
         title, author, publisher,
         min_pages: min_pages || null,
         max_pages: max_pages || null,
         page, sort_by, sort_order
     });
-
+    //список книг
     const list=document.getElementById('books-list'); 
     list.innerHTML='';
     if(res.result.books.length===0){
         list.innerHTML='<p style="text-align:center;">Книг не найдено</p>'; 
         return;
     }
-
+    //див под книги вывод
     res.result.books.forEach(b=>{
         const div=document.createElement('div'); 
         div.className='book';
@@ -297,7 +297,7 @@ async function loadBooks(page=1){
     <b>${b.title}</b><br>Автор: ${b.author}<br>Издательство: ${b.publisher}<br>Страниц: ${b.pages}</div>${actions}`;
         list.appendChild(div);
     });
-
+    //пагинация
     const pag=document.getElementById('pagination'); 
         pag.innerHTML='';
         for(let i=1;i<=res.result.total_pages;i++){
@@ -308,7 +308,7 @@ async function loadBooks(page=1){
             pag.appendChild(btn);
         }
     }
-
+//вход
 async function login(){
     const loginInput=document.getElementById('login').value;
     const password=document.getElementById('password').value;
@@ -316,7 +316,7 @@ async function login(){
     if(res.error){alert(res.error.message); return;}
     closeModal('login-modal'); getUser(); loadBooks();
 }
-
+//регистрация
 async function register(){
     const loginInput=document.getElementById('reg-login').value;
     const password=document.getElementById('reg-password').value;
@@ -324,10 +324,11 @@ async function register(){
     if(res.error){alert(res.error.message); return;}
     closeModal('register-modal'); getUser(); loadBooks();
 }
-
+//выход из аккаунта
 async function logout(){await rpc('logout'); getUser(); loadBooks();}
+//удаление аккаунта
 async function deleteAccount(){ if(confirm('Удалить аккаунт?')) { await rpc('delete_account'); getUser(); loadBooks(); }}
-
+//добавление книги
 async function addBook(){
     const title=document.getElementById('book-title').value;
     const author=document.getElementById('book-author').value;
@@ -338,7 +339,7 @@ async function addBook(){
     alert('Книга добавлена'); loadBooks();
 }
 
-// --- Редактирование книг ---
+//Редактирование книг
 function showEditModal(id,title,author,publisher,pages){
     editBookId=id;
     document.getElementById('edit-title').value=title;
@@ -347,7 +348,7 @@ function showEditModal(id,title,author,publisher,pages){
     document.getElementById('edit-pages').value=pages;
     showModal('edit-modal');
 }
-
+//Сохранение наредактированного
 async function saveEdit(){
     const title=document.getElementById('edit-title').value;
     const author=document.getElementById('edit-author').value;
@@ -357,7 +358,7 @@ async function saveEdit(){
     if(res.error){alert(res.error.message); return;}
     closeModal('edit-modal'); loadBooks();
 }
-
+//Удаление книги
 async function deleteBook(id){
     if(confirm('Удалить книгу?')){
         const res = await rpc('delete_book',id);
