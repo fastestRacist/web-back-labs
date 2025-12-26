@@ -240,7 +240,7 @@ async function rpc(method, params={}) {
 let currentPage=1;
 let editBookId=null;
 let isAdmin=false;
-//приветствие пользователя
+//приветствие пользователя и проверка гость или пользователь
 async function getUser(){
     const res = await rpc('get_user_info');
     const userBlock = document.getElementById('user-block');
@@ -297,7 +297,7 @@ async function loadBooks(page=1){
     <b>${b.title}</b><br>Автор: ${b.author}<br>Издательство: ${b.publisher}<br>Страниц: ${b.pages}</div>${actions}`;
         list.appendChild(div);
     });
-    //пагинация
+    //пагинация переключение страниц
     const pag=document.getElementById('pagination'); 
         pag.innerHTML='';
         for(let i=1;i<=res.result.total_pages;i++){
